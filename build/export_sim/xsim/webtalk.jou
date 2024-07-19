@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Webtalk v2021.1 (64-bit)
+# SW Build 3247384 on Thu Jun 10 19:36:07 MDT 2021
+# IP Build 3246043 on Fri Jun 11 00:30:35 MDT 2021
+# Start of session at: Thu Apr  7 20:41:02 2022
+# Process ID: 5758
+# Current directory: /mnt/home/jxlin/panic_exp/build/export_sim/xsim
+# Command line: wbtcv -mode batch -source /mnt/home/jxlin/panic_exp/build/export_sim/xsim/xsim.dir/packet_gen_parallel/webtalk/xsim_webtalk.tcl -notrace
+# Log file: /mnt/home/jxlin/panic_exp/build/export_sim/xsim/webtalk.log
+# Journal file: /mnt/home/jxlin/panic_exp/build/export_sim/xsim/webtalk.jou
+#-----------------------------------------------------------
+source /mnt/home/jxlin/panic_exp/build/export_sim/xsim/xsim.dir/packet_gen_parallel/webtalk/xsim_webtalk.tcl -notrace

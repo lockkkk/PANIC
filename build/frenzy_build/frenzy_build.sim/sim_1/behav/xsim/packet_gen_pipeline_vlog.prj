@@ -1,0 +1,127 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  \
+"../../../../../../src/AES_engine.v" \
+"../../../../../../src/SHA_engine.v" \
+"../../../../../../src/SHA_warper.v" \
+"../../../../../../src/AES/aes_256.v" \
+"../../../../../../lib/axis/rtl/arbiter.v" \
+"../../../../../../src/asyn_SHA.v" \
+"../../../../../../lib/axi/rtl/axi_dma.v" \
+"../../../../../../lib/axi/rtl/axi_dma_rd.v" \
+"../../../../../../lib/axi/rtl/axi_dma_wr.v" \
+"../../../../../../lib/axi/rtl/axi_ram.v" \
+"../../../../../../lib/axis/rtl/axis_adapter.v" \
+"../../../../../../lib/axis/rtl/axis_arb_mux.v" \
+"../../../../../../lib/axis/rtl/axis_async_fifo.v" \
+"../../../../../../lib/axis/rtl/axis_fifo.v" \
+"../../../../../../lib/axis/rtl/axis_fifo_adapter.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_align.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_arbiter.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_binary_op.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_crossbar.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_damq_ctrl.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_damq_tracker.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_decode.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_decr.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_dff.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_diag_op.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_encode.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_err_rpt.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_fifo_ctrl.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_fifo_tracker.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_gate_bits.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_incr.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_interleave.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_lod.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_mat_mult.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_matrix_arbiter.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_multi_hot_det.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_one_hot_filter.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_one_hot_therm_conv.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_prefix_arbiter.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_prefix_arbiter_base.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_prefix_net.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_reduce_bits.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_regfile.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_reverse.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_rotate.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_rr_arbiter.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_rr_arbiter_base.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_samq_ctrl.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_samq_tracker.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_select_1ofn.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_select_mofn.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_wf_alloc.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_wf_alloc_dpa.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_wf_alloc_loop.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_wf_alloc_mux.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_wf_alloc_rep.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_wf_alloc_rot.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_wf_alloc_sdpa.v" \
+"../../../../../../src/compute_engine.v" \
+"../../../../../../src/SHA3/f_permutation.v" \
+"../../../../../../src/header_parser.v" \
+"../../../../../../src/SHA3/keccak.v" \
+"../../../../../../src/SHA3/padder.v" \
+"../../../../../../src/SHA3/padder1.v" \
+"../../../../../../src/panic.v" \
+"../../../../../../src/panic_dma.v" \
+"../../../../../../src/panic_memory_alloc.v" \
+"../../../../../../src/panic_noc_warp.v" \
+"../../../../../../src/panic_parser.v" \
+"../../../../../../src/panic_scheduler.v" \
+"../../../../../../src/perf_counter.v" \
+"../../../../../../src/perf_laten.v" \
+"../../../../../../src/pifo_warp.v" \
+"../../../../../../lib/axis/rtl/priority_encoder.v" \
+"../../../../../../src/rand_mem_alloc.v" \
+"../../../../../../src/SHA3/rconst2in1.v" \
+"../../../../../../src/AES/round.v" \
+"../../../../../../src/SHA3/round2in1.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/router_wrap.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/rtr_alloc_mac.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/rtr_channel_input.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/rtr_channel_output.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/rtr_crossbar_mac.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/rtr_fc_state.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/rtr_flags_mux.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/rtr_flit_buffer.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/rtr_flit_type_check.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/rtr_flow_ctrl_input.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/rtr_flow_ctrl_output.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/rtr_ip_ctrl_mac.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/rtr_next_hop_addr.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/rtr_op_ctrl_mac.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/rtr_route_filter.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/rtr_routing_logic.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/rtr_top.v" \
+"../../../../../../lib/axis/rtl/sync_reset.v" \
+"../../../../../../src/AES/table.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/vcr_alloc_mac.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/vcr_ip_ctrl_mac.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/vcr_ivc_ctrl.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/vcr_op_ctrl_mac.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/vcr_ovc_ctrl.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/vcr_sw_alloc_sep_if.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/vcr_sw_alloc_sep_of.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/vcr_sw_alloc_wf.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/vcr_top.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/vcr_vc_alloc_sep_if.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/vcr_vc_alloc_sep_of.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/vcr_vc_alloc_wf.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/whr_alloc_mac.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/whr_ip_ctrl_mac.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/whr_op_ctrl_mac.v" \
+"../../../../../../src/Open-Source-Network-on-Chip-Router-RTL/src/whr_top.v" \
+
+sv xil_defaultlib  \
+"../../../../../../src/pifo.sv" \
+
+verilog xil_defaultlib  \
+"../../../../../../src/packet_gen_pipeline.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

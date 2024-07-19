@@ -1,0 +1,6 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "/mnt/home/jxlin/panic_exp/src/packet_gen_pipeline.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module packet_gen_pipeline
+WARNING: [VRFC 10-1581] illegal format specifier   for display [/mnt/home/jxlin/panic_exp/src/packet_gen_pipeline.v:24]
+WARNING: [VRFC 10-3380] identifier 'packet_len' is used before its declaration [/mnt/home/jxlin/panic_exp/src/packet_gen_pipeline.v:39]
+WARNING: [VRFC 10-3380] identifier 'pattern_id' is used before its declaration [/mnt/home/jxlin/panic_exp/src/packet_gen_pipeline.v:40]
+WARNING: [VRFC 10-3380] identifier 'packet_len' is used before its declaration [/mnt/home/jxlin/panic_exp/src/packet_gen_pipeline.v:41]

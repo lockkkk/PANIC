@@ -1,0 +1,13 @@
+#-----------------------------------------------------------
+# xsim v2021.1 (64-bit)
+# SW Build 3247384 on Thu Jun 10 19:36:07 MDT 2021
+# IP Build 3246043 on Fri Jun 11 00:30:35 MDT 2021
+# Start of session at: Thu Apr  7 20:40:29 2022
+# Process ID: 5445
+# Current directory: /mnt/home/jxlin/panic_exp/build/export_sim/xsim
+# Command line: xsim -log simulate.log -mode tcl -source {xsim.dir/packet_gen_parallel/xsim_script.tcl}
+# Log file: /mnt/home/jxlin/panic_exp/build/export_sim/xsim/simulate.log
+# Journal file: /mnt/home/jxlin/panic_exp/build/export_sim/xsim/xsim.jou
+#-----------------------------------------------------------
+source xsim.dir/packet_gen_parallel/xsim_script.tcl
+source cmd.tcl

@@ -1,0 +1,12 @@
+#-----------------------------------------------------------
+# Vivado v2021.1 (64-bit)
+# SW Build 3247384 on Thu Jun 10 19:36:07 MDT 2021
+# IP Build 3246043 on Fri Jun 11 00:30:35 MDT 2021
+# Start of session at: Thu Apr  7 20:39:35 2022
+# Process ID: 4719
+# Current directory: /mnt/home/jxlin/panic_exp/build
+# Command line: vivado -mode batch -source create_prj_test1.tcl
+# Log file: /mnt/home/jxlin/panic_exp/build/vivado.log
+# Journal file: /mnt/home/jxlin/panic_exp/build/vivado.jou
+#-----------------------------------------------------------
+source create_prj_test1.tcl

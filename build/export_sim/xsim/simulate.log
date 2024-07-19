@@ -1,0 +1,56 @@
+#-----------------------------------------------------------
+# xsim v2021.1 (64-bit)
+# SW Build 3247384 on Thu Jun 10 19:36:07 MDT 2021
+# IP Build 3246043 on Fri Jun 11 00:30:35 MDT 2021
+# Start of session at: Thu Apr  7 20:40:29 2022
+# Process ID: 5445
+# Current directory: /mnt/home/jxlin/panic_exp/build/export_sim/xsim
+# Command line: xsim -log simulate.log -mode tcl -source {xsim.dir/packet_gen_parallel/xsim_script.tcl}
+# Log file: /mnt/home/jxlin/panic_exp/build/export_sim/xsim/simulate.log
+# Journal file: /mnt/home/jxlin/panic_exp/build/export_sim/xsim/xsim.jou
+#-----------------------------------------------------------
+source xsim.dir/packet_gen_parallel/xsim_script.tcl
+# xsim {packet_gen_parallel} -autoloadwcfg -tclbatch {cmd.tcl} -key {Behavioral:sim_1:Functional:packet_gen_parallel}
+Time resolution is 1 ps
+source cmd.tcl
+## set curr_wave [current_wave_config]
+## if { [string length $curr_wave] == 0 } {
+##   if { [llength [get_objects]] > 0} {
+##     add_wave /
+##     set_property needs_save false [current_wave_config]
+##   } else {
+##      send_msg_id Add_Wave-1 WARNING "No top level signals found. Simulator will start without a wave window. If you want to open a wave window go to 'File->New Waveform Configuration' or type 'create_wave_config' in the TCL console."
+##   }
+## }
+## run -all
+   ___                              
+  / __\_ __  ___  _ __   ____ _   _ 
+ / _\ | '__|/ _ \| '_ \ |_  /| | | |
+/ /   | |  |  __/| | | | / / | |_| |
+\/    |_|   \___||_| |_|/___| \__, |
+                              |___/ 
+--------Simulation Parameter--------
+|* Simulation Frequency: 250Mhz    |
+|* Logging Interval: 4K cycles/log |
+|* Packet Size Range: [64B, 2048B] |
+|* Offload engine variance: 40     |
+|* Chain: -> A(A1, A2, A3) ->      |
+|                                  |
+|* More detail about the chainning |
+|  model please reference Fig.7(b) |
+|  in Frenzy paper                 |
+|----------------------------------|
+--------------
+RST, Start Sending   64B packet
+- Throughput 63.968750 Gbps 
+- Throughput 63.968750 Gbps 
+- Throughput 63.968750 Gbps 
+--------------
+RST, Start Sending  128B packet
+- Throughput 85.312500 Gbps 
+INFO: [Common 17-41] Interrupt caught. Command should exit soon.
+run: Time (s): cpu = 00:00:01 ; elapsed = 00:00:23 . Memory (MB): peak = 2842.996 ; gain = 8.004 ; free physical = 114195 ; free virtual = 125434
+INFO: [Common 17-344] 'run' was cancelled
+xsim: Time (s): cpu = 00:00:02 ; elapsed = 00:00:24 . Memory (MB): peak = 2842.996 ; gain = 798.113 ; free physical = 114195 ; free virtual = 125434
+INFO: [Common 17-344] 'source' was cancelled
+INFO: [Common 17-206] Exiting xsim at Thu Apr  7 20:41:04 2022...

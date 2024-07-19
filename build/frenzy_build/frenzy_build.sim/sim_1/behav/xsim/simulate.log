@@ -1,0 +1,110 @@
+Time resolution is 1 ps
+   ___                              
+  / __\_ __  ___  _ __   ____ _   _ 
+ / _\ | '__|/ _ \| '_ \ |_  /| | | |
+/ /   | |  |  __/| | | | / / | |_| |
+\/    |_|   \___||_| |_|/___| \__, |
+                              |___/ 
+--------Simulation Parameter--------
+|* Simulation Frequency: 250Mhz    |
+|* Logging Interval: 4K cycles/log |
+|* Packet Size Range: [64B, 2048B] |
+|* Offload engine variance: 40     |
+|* Chain: -> A(A1, A2, A3) ->      |
+|                                  |
+|* More detail about the chainning |
+|  model please reference Fig.7(b) |
+|  in Frenzy paper                 |
+|----------------------------------|
+--------------
+RST, Start Sending   64B packet
+Latency 1342.843750
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.812500
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.812500
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.750000
+- Throughput 7.117188 Gbps 
+AVG len 64.000000 
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.812500
+Latency 1018.875000
+Latency 1018.875000
+- Throughput 7.109375 Gbps 
+AVG len 64.000000 
+Latency 1018.875000
+Latency 1018.812500
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.750000
+- Throughput 7.109375 Gbps 
+AVG len 64.000000 
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.812500
+Latency 1018.875000
+Latency 1018.875000
+- Throughput 7.109375 Gbps 
+AVG len 64.000000 
+Latency 1018.875000
+Latency 1018.812500
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.750000
+- Throughput 7.109375 Gbps 
+AVG len 64.000000 
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.875000
+Latency 1018.812500
+Latency 1018.875000
+Latency 1018.875000
+- Throughput 7.109375 Gbps 
+AVG len 64.000000 
+Latency 1018.875000
+Latency 1018.812500
+--------------
+RST, Start Sending    1B packet
+Latency 2109.187500
+Latency 1421.937500
+Latency 1422.125000
+Latency 1422.062500
+Latency 1421.875000
+Latency 1421.937500
+Latency 1422.125000
+Latency 1422.062500
+- Throughput 4.414062 Gbps 
+AVG len 64.000000 
+Latency 1421.875000
+Latency 1421.937500
+Latency 1422.125000
+Latency 1422.062500
+Latency 1421.875000
+- Throughput 4.414062 Gbps 
+AVG len 64.000000 
+Latency 1421.937500
+Latency 1422.125000
+Latency 1422.062500
+Latency 1421.875000
+- Throughput 4.414062 Gbps 
+AVG len 64.000000 
+Latency 1421.937500
+Latency 1422.125000
