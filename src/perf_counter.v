@@ -46,7 +46,7 @@ reg [31:0] out_pk_counter;
 reg [47:0] in_frame_counter;
 reg [47:0] out_frame_counter;
 
-reg [13:0] inter_cycle_counter;
+reg [9:0] inter_cycle_counter;
 reg [31:0] inter_in_frame_counter[4:0];
 reg [63:0] avg_size;
 reg [31:0] avg_size_pk_count;
@@ -214,22 +214,13 @@ always@(posedge clk) begin
                 max_out_frame_counter <= inter_out_frame_counter;
             end
 
-            if(TEST_MODE == 0) begin
-                if(iter_counter > 1) begin
-                    $display("--------------");
-                    $display("- Traffic Group 1: %f Gbps " ,inter_in_frame_counter[0] * 512 * 1.0 / ((2**14) * 4.0) );
-                    $display("- Traffic Group 2: %f Gbps " ,inter_in_frame_counter[1] * 512 * 1.0 / ((2**14) * 4.0) );
-                    $display("- Traffic Group 3: %f Gbps " ,inter_in_frame_counter[2] * 512 * 1.0 / ((2**14) * 4.0) );
-                end
+            if(iter_counter > 1) begin
+                $display("--------------");
+                $display("- Traffic Group 1: %f Gbps " ,inter_in_frame_counter[0] * 512 * 1.0 / ((2**10) * 4.0) );
+                $display("- Traffic Group 2: %f Gbps " ,inter_in_frame_counter[1] * 512 * 1.0 / ((2**10) * 4.0) );
+                $display("- Traffic Group 3: %f Gbps " ,inter_in_frame_counter[2] * 512 * 1.0 / ((2**10) * 4.0) );
             end
-            else begin
-                if(iter_counter > 1) begin
-                    // $display("--------------");
-                    $display("- Throughput %f Gbps " ,inter_in_frame_counter[3] * 512 * 1.0 / ((2**14) * 4.0) );
-                    $display("AVG len %f ", avg_size / avg_size_pk_count );
-                end
-            end
-            
+
             
             iter_counter <= iter_counter + 1;
         end

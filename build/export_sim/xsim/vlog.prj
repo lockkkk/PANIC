@@ -1,5 +1,5 @@
 sv xpm  \
-"/tools/Xilinx/Vivado/2021.1/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" \
+"/opt/Xilinx-2021.2/Vivado/2021.2/data/ip/xpm/xpm_cdc/hdl/xpm_cdc.sv" \
 
 verilog xil_defaultlib  \
 "../../../src/AES_engine.v" \
@@ -17,6 +17,7 @@ verilog xil_defaultlib  \
 "../../../lib/axis/rtl/axis_async_fifo.v" \
 "../../../lib/axis/rtl/axis_fifo.v" \
 "../../../lib/axis/rtl/axis_fifo_adapter.v" \
+"../../../lib/axis/rtl/axis_mux.v" \
 "../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_align.v" \
 "../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_arbiter.v" \
 "../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_binary_op.v" \
@@ -60,6 +61,9 @@ verilog xil_defaultlib  \
 "../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_wf_alloc_rep.v" \
 "../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_wf_alloc_rot.v" \
 "../../../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_wf_alloc_sdpa.v" \
+"../../../lib/verilog-cam/rtl/cam.v" \
+"../../../lib/verilog-cam/rtl/cam_bram.v" \
+"../../../lib/verilog-cam/rtl/cam_srl.v" \
 "../../../src/compute_engine.v" \
 "../../../src/SHA3/f_permutation.v" \
 "../../../src/header_parser.v" \
@@ -75,7 +79,8 @@ verilog xil_defaultlib  \
 "../../../src/perf_counter.v" \
 "../../../src/perf_laten.v" \
 "../../../src/pifo_warp.v" \
-"../../../lib/axis/rtl/priority_encoder.v" \
+"../../../lib/verilog-cam/rtl/priority_encoder.v" \
+"../../../lib/verilog-cam/rtl/ram_dp.v" \
 "../../../src/rand_mem_alloc.v" \
 "../../../src/SHA3/rconst2in1.v" \
 "../../../src/AES/round.v" \
@@ -117,10 +122,14 @@ verilog xil_defaultlib  \
 "../../../src/Open-Source-Network-on-Chip-Router-RTL/src/whr_top.v" \
 
 sv xil_defaultlib  \
+"../../../src/cam_wrapper.sv" \
+"../../../src/cam_wrapper_fifo.sv" \
+"../../../src/header_parser_wrapper.sv" \
 "../../../src/pifo.sv" \
+"../../../lib/ram.sv" \
 
 verilog xil_defaultlib  \
-"../../../src/packet_gen_parallel.v" \
+"../../../src/packet_gen_pipeline.v" \
 
 verilog xil_defaultlib "glbl.v"
 

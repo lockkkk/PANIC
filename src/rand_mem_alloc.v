@@ -168,7 +168,7 @@ reg [$clog2(CELL_NUM + 10) + 1 : 0] ini_count;
 
 assign  alloc_cell_id = m_cell_fifo_tdata;
 assign  alloc_mem_success = m_cell_fifo_tvalid && alloc_mem_req ;
-assign  alloc_mem_intense = (valid_cell_counter <= 3);
+assign  alloc_mem_intense = (valid_cell_counter <= 32);
 
 assign m_cell_fifo_tready = m_cell_fifo_tvalid && alloc_mem_req;
 

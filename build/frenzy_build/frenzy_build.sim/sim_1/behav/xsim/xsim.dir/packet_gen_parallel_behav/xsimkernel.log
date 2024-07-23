@@ -1,7 +1,0 @@
-Running: xsim.dir/packet_gen_parallel_behav/xsimk -simmode gui -wdb packet_gen_parallel_behav.wdb -simrunnum 0 -socket 37987
-Design successfully loaded
-Design Loading Memory Usage: 58872 KB (Peak: 58872 KB)
-Design Loading CPU Usage: 60 ms
-Simulation completed
-Simulation Memory Usage: 134244 KB (Peak: 198140 KB)
-Simulation CPU Usage: 15780 ms

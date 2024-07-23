@@ -1,10 +1,28 @@
 `timescale 1ns / 1ps
-
+`include "panic_define.v"
 module packet_gen_pipeline;
 
 reg  clk;
 reg rst;
 reg start;
+
+reg                        config_mat_en;
+reg [`MATCH_KEY_WIDTH-1:0] config_mat_key;
+reg [128-1:0]              config_mat_value;
+reg [`MAT_ADDR_WIDTH-1:0]  config_mat_addr;
+
+reg [`PANIC_DESC_LEN_SIZE-1:0] desc_len;
+reg [`PANIC_DESC_CELL_ID_SIZE-1:0] desc_cell_id;
+reg [`PANIC_DESC_CHAIN_SIZE-1:0] desc_chain;
+reg [`PANIC_DESC_PRIO_SIZE-1:0] desc_prio;
+reg [`PANIC_DESC_TIME_SIZE-1:0] desc_time;
+reg                             desc_drop;
+reg [`PANIC_DESC_FLOW_SIZE-1:0] desc_flow_id;
+reg [`PANIC_DESC_TS_SIZE-1:0]   desc_ts;
+
+
+
+ 
 always begin
     clk = ~clk; 
     #2;
@@ -31,15 +49,44 @@ initial begin
     clk = 0;
     rst = 1;
     start = 0;
-    
-    #1000;
-    rst = 0;
-    #600;
-    start = 1;
+    config_mat_en = 0;
     packet_len = 1;
     pattern_id = 0;
+    #1000;
+    rst = 0;
+    #800;
+    config_mat_en = 1;
+    config_mat_key = 33;
+    desc_cell_id = 0;
+    desc_len = 0;
+    desc_drop = 0;
+    desc_chain = 0;
+    desc_prio = 4;
+    desc_flow_id = 1;
+    desc_time = 0;
+    config_mat_value = 0 + {desc_flow_id,desc_drop,desc_time,desc_prio,desc_chain,desc_cell_id,desc_len};
+    #4;
+    config_mat_en = 0;
+    #4;
+    config_mat_en = 1;
+    config_mat_key = 44;
+    desc_cell_id = 0;
+    desc_len = 0;
+    desc_drop = 0;
+    desc_chain = 4;
+    desc_prio = 4;
+    desc_flow_id = 2;
+    desc_time = 8;
+    config_mat_value = 0 + {desc_flow_id,desc_drop,desc_time,desc_prio,desc_chain,desc_cell_id,desc_len};
+    #4;
+    config_mat_en = 0;
+    #2;
+    #600;
+    start = 1;
+
     $display("--------------\nRST, Start Sending %4dB packet", packet_len * 64 );
 end
+
 
 localparam AXIS_DATA_WIDTH = 512;
 localparam AXIS_KEEP_WIDTH = AXIS_DATA_WIDTH / 8;
@@ -78,7 +125,7 @@ panic #
     // Width of AXI memory data bus in bits, normal is 512
     .AXI_DATA_WIDTH(AXIS_DATA_WIDTH),
     // Width of panic memory address bus in bits
-    .AXI_ADDR_WIDTH(16),
+    .AXI_ADDR_WIDTH(18),
 
     /*AXIS INTERFACE PARAMETER*/
     // Width of AXI stream interfaces in bits, normal is 512
@@ -112,6 +159,10 @@ panic_inst
     .clk(clk),
     .rst(rst),
 
+    .config_mat_en(config_mat_en),
+    .config_mat_key(config_mat_key),
+    .config_mat_value(config_mat_value),
+    .config_mat_addr(config_mat_addr),
     /*
     * Receive data from the wire
     */
@@ -176,7 +227,7 @@ reg [15:0] packet_len;
 wire [15:0] header_length;
 assign header_length = (packet_len)*64 - 14;
 
-reg [4:0] flow_id;
+reg [7:0] flow_id;
 
 reg if_next_valid;
 always@(*) begin
@@ -187,10 +238,11 @@ always@(*) begin
         if(if_next_valid) begin
             fifo_rx_axis_tvalid = 1;
             if(c_counter == 0) begin
-                fifo_rx_axis_tdata = 512'h1514131211100F0E0D0C0B0A0908070605040302010081B90801020001006501A8C06401A8C0B7B5114000400000F2050045000855545352515AD5D4D3D2D1DA; // udp header
+                fifo_rx_axis_tdata = 512'h1514131211100F0E0D0C0B0A0908070605040302010081B90801020001006501A8C06401A8C0B7B5114000400000F2050045000855545352515AD5D4D3D20000; // udp header
                 fifo_rx_axis_tdata[16*8 +: 8] = header_length[15:8];
                 fifo_rx_axis_tdata[17*8 +: 8] = header_length[7:0];
                 fifo_rx_axis_tdata[35*8 +: 8] = flow_id;
+                fifo_rx_axis_tdata[0 +: 9] = counter;
                 fifo_rx_axis_tkeep = {64{1'b1}};
             end
             else begin
@@ -213,7 +265,7 @@ always@(posedge clk) begin
         counter <= 1;
         c_counter <= 0;
         cycle_counter <= 0;
-        flow_id <= 0;
+        flow_id <= 44;
         if_next_valid <= 0;
         total_counter <= 0;
     end
@@ -227,102 +279,19 @@ always@(posedge clk) begin
             if(c_counter == packet_len-1) begin
                 c_counter <= 0;
                 counter <= counter + 1;
-
-                // if(pattern_id == 0) begin
-                //     packet_len <= 1;
-                // end
-                // else if(pattern_id == 1) begin
-                //     packet_len <= 8;
-                        
-                // end
-                // else if(pattern_id == 2) begin
-                    packet_len <= 32;
-                // end
             end
         end
         if(start && fifo_rx_axis_tlast && fifo_rx_axis_tvalid && fifo_rx_axis_tready) begin
-            if(pattern_id == 0) begin
-                if(counter%10 < 2) begin
-                    flow_id <= 5;
-                end
-                else if(counter%10 < 3) begin
-                    flow_id <= 6;
-                end
-                else begin
-                    flow_id <= 7;
-                end
-               
+            if(counter%10 < 4) begin
+                flow_id <= 33;
             end
-            else if(pattern_id == 1) begin
-                if(counter%10 < 2) begin
-                    flow_id <= 5;
-                end
-                else if(counter%10 < 4) begin
-                    flow_id <= 6;
-                end
-                else begin
-                    flow_id <= 7;
-                end
+            else begin
+                flow_id <= 44;
             end
-            else if(pattern_id == 2) begin
-                if(counter%10 < 2) begin
-                    flow_id <= 5;
-                end
-                else if(counter%10 < 5) begin
-                    flow_id <= 6;
-                end
-                else begin
-                    flow_id <= 7;
-                end
-            end
-            else if(pattern_id == 3) begin
-                if(counter%10 < 2) begin
-                    flow_id <= 5;
-                end
-                else if(counter%10 < 6) begin
-                    flow_id <= 6;
-                end
-                else begin
-                    flow_id <= 7;
-                end
-            end
-            else if(pattern_id == 4) begin
-                if(counter%10 < 2) begin
-                    flow_id <= 5;
-                end
-                else if(counter%10 < 7) begin
-                    flow_id <= 6;
-                end
-                else begin
-                    flow_id <= 7;
-                end
-            end
-            else if(pattern_id == 5) begin
-                if(counter%10 < 2) begin
-                    flow_id <= 5;
-                end
-                else if(counter%10 < 8) begin
-                    flow_id <= 6;
-                end
-                else begin
-                    flow_id <= 7;
-                end
-            end
-            else if(pattern_id == 6) begin
-                if(counter%10 < 2) begin
-                    flow_id <= 5;
-                end
-                else if(counter%10 < 9) begin
-                    flow_id <= 6;
-                end
-                else begin
-                    flow_id <= 7;
-                end
-            end
-            // flow_id <= 7 ;
+            // flow_id <= 1234;
         end
         
-        if($urandom % 128 < 100) begin
+        if( (counter <= 5000)) begin
             if_next_valid <= 1;
         end
         else begin

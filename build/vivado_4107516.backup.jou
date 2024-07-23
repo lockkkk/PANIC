@@ -1,0 +1,13 @@
+#-----------------------------------------------------------
+# Vivado v2021.2 (64-bit)
+# SW Build 3367213 on Tue Oct 19 02:47:39 MDT 2021
+# IP Build 3369179 on Thu Oct 21 08:25:16 MDT 2021
+# Start of session at: Mon Jul 22 18:14:20 2024
+# Process ID: 4107516
+# Current directory: /home/jxlin/panic_ocp/build
+# Command line: vivado -mode batch -source create_prj_test1.tcl
+# Log file: /home/jxlin/panic_ocp/build/vivado.log
+# Journal file: /home/jxlin/panic_ocp/build/vivado.jou
+# Running On: ditto, OS: Linux, CPU Frequency: 1000.058 MHz, CPU Physical cores: 31, Host memory: 270130 MB
+#-----------------------------------------------------------
+source create_prj_test1.tcl

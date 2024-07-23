@@ -100,14 +100,19 @@ module panic #
     output  wire                                m_rx_axis_tvalid,
     input   wire                                m_rx_axis_tready,
     output  wire                                m_rx_axis_tlast,
-    output  wire                                m_rx_axis_tuser
+    output  wire                                m_rx_axis_tuser,
+
+    input  wire                        config_mat_en,
+    input  wire [`MATCH_KEY_WIDTH-1:0] config_mat_key,
+    input  wire [128-1:0]              config_mat_value,
+    input  wire [`MAT_ADDR_WIDTH-1:0]  config_mat_addr
 
 );
 localparam FREE_PORT_NUM = 2;
 localparam CELL_NUM = 2**(AXI_ADDR_WIDTH+1)/`PANIC_CELL_SIZE;
 localparam CELL_ID_WIDTH = $clog2(CELL_NUM);
 localparam NUMPIFO = 128;
-localparam SMALL_PK_OPT = (TEST_MODE == 1) || (TEST_MODE == 2 || TEST_MODE == 3 )? 1:0;
+localparam SMALL_PK_OPT = 0;
 
 wire [ENGINE_NUM*2 -1 :0] credit_control;
 
@@ -202,11 +207,6 @@ wire                          panic_parser_axis_tready;
 wire                          panic_parser_axis_tlast;
 wire                          panic_parser_axis_tuser;
 
-// wire for parser output - packet descriptor
-wire [`PANIC_DESC_WIDTH-1:0]         panic_parser_packet_desc;
-wire                                 panic_parser_packet_desc_valid;
-wire                                 panic_parser_packet_desc_ready;
-
 
 panic_parser #(
     .AXIS_DATA_WIDTH(AXIS_DATA_WIDTH),
@@ -230,6 +230,10 @@ panic_parser_inst(
     .clk(clk),
     .rst(rst),
 
+    .config_mat_en(config_mat_en),
+    .config_mat_key(config_mat_key),
+    .config_mat_value(config_mat_value),
+    .config_mat_addr(config_mat_addr),
     /*
     * Receive data from the wire
     */
@@ -250,13 +254,6 @@ panic_parser_inst(
     .m_rx_axis_tready(panic_parser_axis_tready),
     .m_rx_axis_tlast(panic_parser_axis_tlast),
     .m_rx_axis_tuser(),
-
-    /*
-    * Send packet descriptor to the packet scheduler
-    */
-    .m_packet_desc(panic_parser_packet_desc),
-    .m_packet_desc_valid(panic_parser_packet_desc_valid),
-    .m_packet_desc_ready(panic_parser_packet_desc_ready),
 
     /*
     * Memory allocator assign memory address for each packet

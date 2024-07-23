@@ -1,1 +1,0 @@
--wto "90cb01782e6644c8b22cb3e74266aba8" --incr --debug "typical" --relax --mt "8" -L "xil_defaultlib" -L "uvm" -L "unisims_ver" -L "unimacro_ver" -L "secureip" -L "xpm" --snapshot "packet_gen_parallel_behav" "xil_defaultlib.packet_gen_parallel" "xil_defaultlib.glbl" -log "elaborate.log" 

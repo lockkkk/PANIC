@@ -202,6 +202,7 @@ set files [list \
  [file normalize "${origin_dir}/../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_wf_alloc_rot.v"] \
  [file normalize "${origin_dir}/../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_wf_alloc_sdpa.v"] \
  [file normalize "${origin_dir}/../src/SHA3/f_permutation.v"] \
+ [file normalize "${origin_dir}/../src/header_parser_wrapper.sv"] \
  [file normalize "${origin_dir}/../src/header_parser.v"] \
  [file normalize "${origin_dir}/../src/SHA3/keccak.v"] \
  [file normalize "${origin_dir}/../src/SHA3/padder.v"] \
@@ -216,6 +217,8 @@ set files [list \
  [file normalize "${origin_dir}/../src/panic_scheduler.v"] \
  [file normalize "${origin_dir}/../src/perf_counter.v"] \
  [file normalize "${origin_dir}/../src/perf_laten.v"] \
+ [file normalize "${origin_dir}/../src/cam_wrapper.sv"] \
+  [file normalize "${origin_dir}/../src/cam_wrapper_fifo.sv"] \
  [file normalize "${origin_dir}/../src/pifo_warp.v"] \
  [file normalize "${origin_dir}/../lib/axis/rtl/priority_encoder.v"] \
  [file normalize "${origin_dir}/../src/rand_mem_alloc.v"] \
@@ -280,13 +283,19 @@ set files [list \
  [file normalize "${origin_dir}/../src/Open-Source-Network-on-Chip-Router-RTL/src/clib/c_scatter.v"] \
  [file normalize "${origin_dir}/../src/compute_engine.v"] \
  [file normalize "${origin_dir}/../src/onehot_to_bin.v"] \
- [file normalize "${origin_dir}/../src/packet_gen_parallel.v"] \
+ [file normalize "${origin_dir}/../src/packet_gen_pipeline.v"] \
  [file normalize "${origin_dir}/../lib/axis/rtl/axis_async_fifo_adapter.v"] \
  [file normalize "${origin_dir}/../lib/axis/rtl/axis_switch.v"] \
  [file normalize "${origin_dir}/../lib/axis/rtl/axis_register.v"] \
  [file normalize "${origin_dir}/../lib/axis/rtl/axis_mux.v"] \
  [file normalize "${origin_dir}/../lib/axis/rtl/axis_demux.v"] \
  [file normalize "${origin_dir}/../lib/axis/rtl/axis_arb_mux.v"] \
+ [file normalize "${origin_dir}/../lib/verilog-cam/rtl/cam.v"] \
+ [file normalize "${origin_dir}/../lib/verilog-cam/rtl/cam_bram.v"] \
+ [file normalize "${origin_dir}/../lib/verilog-cam/rtl/cam_srl.v"] \
+ [file normalize "${origin_dir}/../lib/verilog-cam/rtl/priority_encoder.v"]\
+ [file normalize "${origin_dir}/../lib/verilog-cam/rtl/ram_dp.v"]\
+ [file normalize "${origin_dir}/../lib/ram.sv"]\
 ]
 add_files -norecurse -fileset $obj $files
 
@@ -302,7 +311,7 @@ set_property -name "file_type" -value "SystemVerilog" -objects $file_obj
 
 # Set 'sources_1' fileset properties
 set obj [get_filesets sources_1]
-set_property -name "top" -value "packet_gen_parallel" -objects $obj
+set_property -name "top" -value "packet_gen_pipeline" -objects $obj
 set_property -name "top_auto_set" -value "0" -objects $obj
 
 # Create 'constrs_1' fileset (if not found)
@@ -329,7 +338,7 @@ set obj [get_filesets sim_1]
 
 # Set 'sim_1' fileset properties
 set obj [get_filesets sim_1]
-set_property -name "top" -value "packet_gen_parallel" -objects $obj
+set_property -name "top" -value "packet_gen_pipeline" -objects $obj
 set_property -name "top_auto_set" -value "0" -objects $obj
 set_property -name "top_lib" -value "xil_defaultlib" -objects $obj
 

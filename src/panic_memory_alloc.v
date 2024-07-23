@@ -110,7 +110,7 @@ always @(posedge clk) begin
         rr_counter <= 0;
     end
     else begin
-        if(alloc_mem_req && alloc_mem_success) begin
+        if(alloc_mem_req) begin
             rr_counter <= rr_counter +1;
         end
     end
