@@ -15,7 +15,7 @@ module header_parser #
     input  wire                        config_mat_en,
     input  wire [`MATCH_KEY_WIDTH-1:0] config_mat_key,
     input  wire [128-1:0]              config_mat_value,
-    input  wire [`MAT_ADDR_WIDTH-1:0]  config_mat_addr,
+    // input  wire [`MAT_ADDR_WIDTH-1:0]  config_mat_addr,
 
     /*
      * AXI input
@@ -77,33 +77,32 @@ TCP/UDP Frame (IPv6)
 */
 parameter CYCLE_COUNT = (38+KEEP_WIDTH-1)/KEEP_WIDTH;
 
+reg [15:0] eth_type_reg = 15'd0, eth_type_next;
+reg [3:0] ihl_reg = 4'd0, ihl_next;
 
-reg [15:0] eth_type_next;
-reg [3:0] ihl_next;
-
-reg [4*8-1:0] ip_src_next;
-reg [4*8-1:0] ip_dest_next;
-reg [4*8-1:0] ip_len_next;
-reg [2*8-1:0] port_src_next;
-reg [2*8-1:0] port_dest_next;
+reg [4*8-1:0] ip_src_reg = 0, ip_src_next;
+reg [4*8-1:0] ip_dest_reg = 0, ip_dest_next;
+reg [4*8-1:0] ip_len_reg = 0, ip_len_next;
+reg [2*8-1:0] port_src_reg = 0, port_src_next;
+reg [2*8-1:0] port_dest_reg = 0, port_dest_next;
 
 
-reg ipv4_next;
-reg tcp_next;
-reg udp_next;
+reg ipv4_reg = 1'b0, ipv4_next;
+reg tcp_reg = 1'b0, tcp_next;
+reg udp_reg = 1'b0, udp_next;
 
 always @* begin
-    eth_type_next = 0;
-    ipv4_next = 0;
-    tcp_next = 0;
-    udp_next = 0;
+    eth_type_next = eth_type_reg;
+    ipv4_next = ipv4_reg;
+    tcp_next = tcp_reg;
+    udp_next = udp_reg;
     
-    port_src_next = 0;
-    port_dest_next = 0;
-    ip_src_next   = 0;
-    ip_dest_next   = 0;
-    ip_len_next   = 0;
-    ihl_next = 0;
+    port_src_next = port_src_reg;
+    port_dest_next = port_dest_reg;
+    ip_src_next   = ip_src_reg;
+    ip_dest_next   = ip_dest_reg;
+    ip_len_next   = ip_len_reg;
+    ihl_next = ihl_reg;
 
     
     if(s_axis_tvalid) begin
@@ -157,49 +156,77 @@ always @* begin
         end
     end
 end
+reg signed [5:0] R;
 
-wire lookup_value_valid;
-wire [`MAT_VALUE_SIZE-1 : 0] lookup_value_data;
-wire [32-1 : 0] lookup_value_user;
+reg [9:0] variance_range;
+wire [`PANIC_DESC_TIME_SIZE - 1 : 0] temp_des_time [4 : 0];
 
-cam_wrapper_fifo#(
-.TABLE_SIZE(`MAT_SIZE),
-.KEY_SIZE(`MATCH_KEY_WIDTH),
-.VALUE_SIZE(`MAT_VALUE_SIZE),
-.LOOKUP_USER_WIDTH(32)
-)mat_table(
-	 .clk(clk), 
-	 .rst(rst) ,
-	//lookup port 
-	.s_lookup_req_index(port_src_next),
-	.s_lookup_req_valid((s_axis_tvalid && udp_next)),
-	.s_lookup_req_ready(s_axis_tready), 
-    .s_lookup_req_user(ip_len_next + 14),
-	.m_lookup_value_valid(m_desc_valid),
-	.m_lookup_value_data(lookup_value_data),
-	.m_lookup_value_ready(m_desc_ready),
-    .m_lookup_value_user(lookup_value_user),
+assign temp_des_time[0] = (4 * m_desc_pk_len * 6/100) - (m_desc_pk_len/64);
+assign temp_des_time[1] = (7 * m_desc_pk_len * 6/100) - (m_desc_pk_len/64);
+assign temp_des_time[2] = (3 * m_desc_pk_len * 6/100) - (m_desc_pk_len/64);
 
+reg rr_reg = 0;
 
-	//update port 
-	.s_update_req_index(config_mat_key),
-	.s_update_req_data(config_mat_value),
-	.s_update_req_valid(config_mat_en),
-	.s_update_req_ready() // should never be low
-);
+reg [95:0] mat_table [0:7];
+wire [2:0] config_mat_addr;
+wire [2:0] match_addr;
+assign config_mat_addr = config_mat_key;
 
+always @(posedge clk) begin
+    if(config_mat_en) begin
+        mat_table[config_mat_addr] <= config_mat_value;
+    end
+end
+
+assign match_addr = port_src_next;
+reg [95:0] tmp_desc; 
 always @*begin
     m_desc_prio = 1; // any value
     m_desc_time = 2; // any value
     m_desc_chain = 0;
-    m_desc_pk_len = lookup_value_user; // add eth packet header
-    if(m_desc_valid && m_desc_ready) begin
-        m_desc_prio = lookup_value_data[`PANIC_DESC_PRIO_OF +: `PANIC_DESC_PRIO_SIZE];
-        m_desc_time = lookup_value_data[`PANIC_DESC_TIME_OF +: `PANIC_DESC_TIME_SIZE];
-        m_desc_chain = lookup_value_data[`PANIC_DESC_CHAIN_OF +: `PANIC_DESC_CHAIN_SIZE];
-        m_desc_flow_id = lookup_value_data[`PANIC_DESC_FLOW_OF +: `PANIC_DESC_FLOW_SIZE];
+    m_desc_pk_len = ip_len_next + 14; // add eth packet header
+    tmp_desc = 0;
+
+    if(s_axis_tvalid) begin
+        if(udp_next) begin
+            tmp_desc = mat_table[match_addr];
+            m_desc_time = tmp_desc[`PANIC_DESC_TIME_OF +: `PANIC_DESC_TIME_SIZE];
+            m_desc_chain = tmp_desc[`PANIC_DESC_CHAIN_OF +: `PANIC_DESC_CHAIN_SIZE];
+            m_desc_flow_id = tmp_desc[`PANIC_DESC_FLOW_OF +: `PANIC_DESC_FLOW_SIZE];
+            m_desc_prio = tmp_desc[`PANIC_DESC_PRIO_OF +: `PANIC_DESC_PRIO_SIZE];
+        end
     end
+
 end
+always @(posedge clk) begin
+
+    eth_type_reg <= eth_type_next;
+    ihl_reg <= ihl_next;
+
+    ipv4_reg <= ipv4_next;
+    tcp_reg <= tcp_next;
+    udp_reg <= udp_next;
+
+    ip_src_reg <= ip_src_next;
+    ip_dest_reg <= ip_dest_next;
+    ip_len_reg <= ip_len_next;
+    port_src_reg <= port_src_next;
+    port_dest_reg <= port_dest_next;
+
+    if(udp_next && port_src_next== 0)
+        rr_reg <= rr_reg + 1;
+    
+    variance_range = 0.4 * temp_des_time[0];
+    if(variance_range == 0)
+        R = 0;
+    else begin
+        R = $urandom %(variance_range * 2);
+        R = $signed((variance_range-1) - R);
+    end
+
+end
+
+
 
 // ila_parser hearder_parser_debug (
 // 	.clk(clk), // input wire clk

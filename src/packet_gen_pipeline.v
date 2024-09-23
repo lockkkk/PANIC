@@ -50,7 +50,7 @@ initial begin
     rst = 1;
     start = 0;
     config_mat_en = 0;
-    packet_len = 1;
+    packet_len = 4;
     pattern_id = 0;
     #1000;
     rst = 0;
@@ -76,7 +76,7 @@ initial begin
     desc_chain = 4;
     desc_prio = 4;
     desc_flow_id = 2;
-    desc_time = 8;
+    desc_time = 4;
     config_mat_value = 0 + {desc_flow_id,desc_drop,desc_time,desc_prio,desc_chain,desc_cell_id,desc_len};
     #4;
     config_mat_en = 0;
@@ -273,6 +273,7 @@ always@(posedge clk) begin
         if(start) begin
             cycle_counter <= cycle_counter + 1;
             int_hash <=  $urandom;
+            if_next_valid <=1;
         end
         if(start && fifo_rx_axis_tready && fifo_rx_axis_tvalid) begin
             c_counter<= c_counter+1;
@@ -291,7 +292,7 @@ always@(posedge clk) begin
             // flow_id <= 1234;
         end
         
-        if( (counter <= 5000)) begin
+        if( (counter <= 500)) begin
             if_next_valid <= 1;
         end
         else begin

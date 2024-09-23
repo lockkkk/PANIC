@@ -51,7 +51,6 @@ axis_fifo #(
     .USER_ENABLE(0),
     .ID_ENABLE(0),
     .DEST_ENABLE(0),
-    .USER_ENABLE(0),
     .FRAME_FIFO(0)
 )
 free_port0_fifo (
@@ -87,7 +86,6 @@ axis_fifo #(
     .USER_ENABLE(0),
     .ID_ENABLE(0),
     .DEST_ENABLE(0),
-    .USER_ENABLE(0),
     .FRAME_FIFO(0)
 )
 free_port1_fifo (
@@ -144,7 +142,6 @@ axis_fifo #(
     .USER_ENABLE(0),
     .ID_ENABLE(0),
     .DEST_ENABLE(0),
-    .USER_ENABLE(0),
     .FRAME_FIFO(0)
 )
 cell_fifo (

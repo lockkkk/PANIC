@@ -50,7 +50,7 @@ module panic_parser #
     input  wire [AXIS_DATA_WIDTH-1:0]           s_rx_axis_tdata,
     input  wire [AXIS_KEEP_WIDTH-1:0]           s_rx_axis_tkeep,
     input  wire                                 s_rx_axis_tvalid,
-    output wire                                 s_rx_axis_tready,
+    output reg                                 s_rx_axis_tready,
     input  wire                                 s_rx_axis_tlast,
     input  wire                                 s_rx_axis_tuser,
 
@@ -107,7 +107,7 @@ module panic_parser #
 reg [SWITCH_DATA_WIDTH-1:0]      s_output_fifo_tdata;
 reg [SWITCH_KEEP_WIDTH-1:0]      s_output_fifo_tkeep;
 reg                              s_output_fifo_tvalid;
-wire                             s_output_fifo_tready;
+wire                              s_output_fifo_tready;
 reg                              s_output_fifo_tlast;
 reg [SWITCH_DEST_WIDTH-1:0]      s_output_fifo_tdest;
 reg [SWITCH_USER_WIDTH-1:0]      s_output_fifo_tuser;
@@ -149,74 +149,80 @@ output_fifo (
     .m_axis_tuser(m_switch_axis_tuser)
 );
 
-wire [AXIS_DATA_WIDTH-1:0]          after_parse_axis_tdata;
-wire [AXIS_KEEP_WIDTH-1:0]          after_parse_axis_tkeep;
-wire                                after_parse_axis_tvalid;
-reg                                 after_parse_axis_tready;
-wire                                after_parse_axis_tlast;
+assign s_switch_axis_tready = 1;
+reg                                          desc_next;
+reg                                          parse_req;
+wire [`PANIC_DESC_PRIO_SIZE -1 : 0]          desc_prio;
+wire [`PANIC_DESC_CHAIN_SIZE -1 : 0]         desc_chain;
+wire [`PANIC_DESC_TIME_SIZE - 1 : 0]         desc_time;
+wire [`PANIC_DESC_LEN_SIZE - 1 : 0]          desc_pk_len;
+wire [`PANIC_DESC_FLOW_SIZE -1 : 0]          desc_flow_id;
 
-
-wire [`PANIC_DESC_WIDTH-1:0]          packet_desc;
-wire                                  packet_desc_valid;
-reg                                   packet_desc_ready;
-
-header_parser_wrapper #(
-    .AXIS_DATA_WIDTH(AXIS_DATA_WIDTH),
-    .AXIS_KEEP_WIDTH(AXIS_KEEP_WIDTH),
-    .AXIS_LAST_ENABLE(AXIS_LAST_ENABLE),
-    .AXIS_ID_ENABLE(AXIS_ID_ENABLE),
-    .AXIS_DEST_ENABLE(AXIS_DEST_ENABLE),
-    .AXIS_USER_ENABLE(AXIS_USER_ENABLE)
-) header_parser_wrapper_inst (
+header_parser #
+(
+    .DATA_WIDTH(AXIS_DATA_WIDTH),
+    .KEEP_WIDTH(AXIS_KEEP_WIDTH)
+)
+panic_header_parser(
     .clk(clk),
     .rst(rst),
+
+    .s_axis_tdata(s_rx_axis_tdata),
+    .s_axis_tkeep(s_rx_axis_tkeep),
+    .s_axis_tvalid(parse_req),
+    .s_axis_tlast(parse_req),
 
     .config_mat_en(config_mat_en),
     .config_mat_key(config_mat_key),
     .config_mat_value(config_mat_value),
-    .config_mat_addr(config_mat_addr),
 
-    .s_rx_axis_tdata(s_rx_axis_tdata),
-    .s_rx_axis_tkeep(s_rx_axis_tkeep),
-    .s_rx_axis_tvalid(s_rx_axis_tvalid),
-    .s_rx_axis_tready(s_rx_axis_tready),
-    .s_rx_axis_tlast(s_rx_axis_tlast),
-
-    .m_rx_axis_tdata(after_parse_axis_tdata),
-    .m_rx_axis_tkeep(after_parse_axis_tkeep),
-    .m_rx_axis_tvalid(after_parse_axis_tvalid),
-    .m_rx_axis_tready(after_parse_axis_tready),
-    .m_rx_axis_tlast(after_parse_axis_tlast),
-
-    .m_packet_desc(packet_desc),
-    .m_packet_desc_valid(packet_desc_valid),
-    .m_packet_desc_ready(packet_desc_ready)
+    .m_desc_prio(desc_prio),
+    .m_desc_chain(desc_chain),
+    .m_desc_time(desc_time),
+    .m_desc_pk_len(desc_pk_len),
+    .m_desc_flow_id(desc_flow_id)
 );
 
-assign s_switch_axis_tready = 1;
+
+    /* out put packet descriptor*/
+reg [`PANIC_DESC_WIDTH - 1 :0]                          s_parser_desc_fifo_tdata;
+reg                                                     s_parser_desc_fifo_tvalid;
+wire                                                    s_parser_desc_fifo_tready;
+
+reg [`PANIC_DESC_WIDTH - 1 :0]                          m_parser_desc_fifo_tdata;
+reg                                                     m_parser_desc_fifo_tvalid;
+wire                                                    m_parser_desc_fifo_tready;
+
+reg [AXIS_DATA_WIDTH-1:0]           s_parser_buffer_fifo_tdata;
+reg [AXIS_KEEP_WIDTH-1:0]           s_parser_buffer_fifo_tkeep;
+reg                                 s_parser_buffer_fifo_tvalid;
+wire                                s_parser_buffer_fifo_tready;
+reg                                 s_parser_buffer_fifo_tlast;
+
+reg   [15: 0] cycle_counter;
+reg   [`PANIC_DESC_PRIO_SIZE-1: 0] id_counter = 0;
 
 reg [1:0] parser_state;
 reg if_bypass;
 reg [4:0] next_dest_port;
 reg if_drop;
+localparam PK_HEAD_STATE = 0;
+localparam PK_DATA_STATE = 1;
 
-localparam PK_DESC_STATE = 1;
-localparam PK_DATA_STATE = 2;
-reg [`PANIC_DESC_CHAIN_SIZE -1 : 0]         desc_chain;
-reg                                         parse_req; 
 always @(posedge clk) begin
     if(rst) begin
-        parser_state <= PK_DESC_STATE;
+        parser_state <= PK_HEAD_STATE;
         if_bypass <= 0;
         if_drop <= 0;
         next_dest_port <= 0;
     end
     else begin
-        if(parser_state == PK_DESC_STATE) begin
-            if(packet_desc_ready && packet_desc_valid ) begin // TODO: bypass path no allocation
+        cycle_counter = cycle_counter + 1;
+        if(parser_state == PK_HEAD_STATE) begin
+            if(s_output_fifo_tvalid && s_output_fifo_tready ) begin
                 parser_state <= PK_DATA_STATE;
                 next_dest_port <= s_output_fifo_tdest;
-                if(desc_chain == 0 )
+                if( desc_chain == 0 )
                     if_bypass <= 1;
                 else begin
                     if_bypass <= 0;
@@ -229,8 +235,8 @@ always @(posedge clk) begin
             end
         end
         else if (parser_state == PK_DATA_STATE) begin
-            if(after_parse_axis_tvalid && after_parse_axis_tready && after_parse_axis_tlast) begin
-                parser_state <= PK_DESC_STATE;
+            if(s_rx_axis_tvalid && s_rx_axis_tready && s_rx_axis_tlast) begin
+                parser_state <= PK_HEAD_STATE;
             end
         end
     end
@@ -238,6 +244,9 @@ end
 
 integer i;
 always @* begin
+    s_parser_desc_fifo_tdata  = 0;
+    s_parser_desc_fifo_tvalid = 0;
+
     s_output_fifo_tdata = 0;
     s_output_fifo_tvalid = 0;
     s_output_fifo_tkeep = 0;
@@ -245,34 +254,61 @@ always @* begin
     s_output_fifo_tdest = 0;
     s_output_fifo_tlast = 0;
 
-    after_parse_axis_tready = 0;
 
+    s_parser_buffer_fifo_tvalid = 0;
+    s_parser_buffer_fifo_tdata = 0;
+    s_parser_buffer_fifo_tlast = 0;
+    s_parser_buffer_fifo_tkeep = 0;
+
+    s_rx_axis_tready = 0;
+
+    
     alloc_mem_req = 0;
     alloc_mem_size = 0;
     parse_req = 0;
-    desc_chain = 0;
+    desc_next = 0;
 
-    packet_desc_ready = ((parser_state == PK_DESC_STATE) && s_output_fifo_tready);
-    if(packet_desc_ready && packet_desc_valid) begin // packet header
-        s_output_fifo_tdata = packet_desc;
-        
-        desc_chain = packet_desc[`PANIC_DESC_CHAIN_OF +: `PANIC_DESC_CHAIN_SIZE];
+    if((parser_state == PK_HEAD_STATE) && s_rx_axis_tvalid) begin // packet header
+        parse_req = 1;
+
         if(desc_chain == 0 && s_output_fifo_tready) begin // bypass path
-            s_output_fifo_tdata[`PANIC_DESC_CELL_ID_OF  +: `PANIC_DESC_CELL_ID_SIZE]  = alloc_cell_id;
-            s_output_fifo_tdata[`PANIC_DESC_DROP_OF]                          = !alloc_mem_success;
-            s_output_fifo_tvalid = 1;
-            s_output_fifo_tkeep = {{(SWITCH_DATA_WIDTH - `PANIC_DESC_WIDTH)/8{1'd0}},{`PANIC_DESC_WIDTH/8{1'd1}}};
-            s_output_fifo_tuser = 1;            // user = 1 means it does not alloc mem
-            s_output_fifo_tdest = 1;
-            s_output_fifo_tdata[`PANIC_DESC_TS_OF +: `PANIC_DESC_TS_SIZE]= timestamp;
+            // alloc_mem_req = 1;
+            // alloc_mem_size = desc_pk_len;
+
+            // if(alloc_mem_success) begin
+                s_output_fifo_tdata[`PANIC_DESC_LEN_OF   +: `PANIC_DESC_LEN_SIZE]  = desc_pk_len;
+                s_output_fifo_tdata[`PANIC_DESC_CELL_ID_OF  +: `PANIC_DESC_CELL_ID_SIZE]  = alloc_cell_id;
+                s_output_fifo_tdata[`PANIC_DESC_DROP_OF]                          = !alloc_mem_success;
+                // s_output_fifo_tdata[`PANIC_DESC_INTENSE_OF]                       = 0;
+                s_output_fifo_tdata[`PANIC_DESC_PRIO_OF  +: `PANIC_DESC_PRIO_SIZE] =  desc_prio; // calculate priority, which is time stamp here
+                s_output_fifo_tdata[`PANIC_DESC_CHAIN_OF +: `PANIC_DESC_CHAIN_SIZE]  = desc_chain;   // current service  to node 1 then node 2
+
+                s_output_fifo_tdata[`PANIC_DESC_TIME_OF  +: `PANIC_DESC_TIME_SIZE]  = desc_time;   // current service just to node 1
+                s_output_fifo_tdata[`PANIC_DESC_FLOW_OF +: `PANIC_DESC_FLOW_SIZE] = desc_flow_id;
+                s_output_fifo_tvalid = 1;
+                s_output_fifo_tkeep = {{(SWITCH_DATA_WIDTH - `PANIC_DESC_WIDTH)/8{1'd0}},{`PANIC_DESC_WIDTH/8{1'd1}}};
+                s_output_fifo_tuser = 1;            // user = 1 means it does not alloc mem
+                s_output_fifo_tdest = 1;
+                s_output_fifo_tdata[`PANIC_DESC_TS_OF +: `PANIC_DESC_TS_SIZE]= timestamp;
+                desc_next = 1;
+
+            // end
+                
+            
         end
         else if(desc_chain !=0 && s_output_fifo_tready) begin // no bypass, go to scheduler
             alloc_mem_req = 1;
-            alloc_mem_size = packet_desc[`PANIC_DESC_LEN_OF   +: `PANIC_DESC_LEN_SIZE];
+            alloc_mem_size = desc_pk_len;
 
             if(alloc_mem_success) begin
+
+                s_output_fifo_tdata[`PANIC_DESC_LEN_OF   +: `PANIC_DESC_LEN_SIZE]  = desc_pk_len;
                 s_output_fifo_tdata[`PANIC_DESC_CELL_ID_OF  +: `PANIC_DESC_CELL_ID_SIZE]  = alloc_cell_id;
                 s_output_fifo_tdata[`PANIC_DESC_DROP_OF]                          = !alloc_mem_success;
+                s_output_fifo_tdata[`PANIC_DESC_PRIO_OF  +: `PANIC_DESC_PRIO_SIZE] =  desc_prio; // calculate priority, which is time stamp here
+                s_output_fifo_tdata[`PANIC_DESC_CHAIN_OF +: `PANIC_DESC_CHAIN_SIZE]  = desc_chain;   // current service  to node 1 then node 2
+                s_output_fifo_tdata[`PANIC_DESC_TIME_OF  +: `PANIC_DESC_TIME_SIZE]  = desc_time;   // current service just to node 1
+                s_output_fifo_tdata[`PANIC_DESC_FLOW_OF +: `PANIC_DESC_FLOW_SIZE] = desc_flow_id;
                 s_output_fifo_tdata[`PANIC_DESC_TS_OF +: `PANIC_DESC_TS_SIZE]= timestamp;
                 s_output_fifo_tdata[`PANIC_DESC_PORT_OF]                           = alloc_port_id;
 
@@ -285,18 +321,24 @@ always @* begin
                 else begin
                     s_output_fifo_tdest = 3;
                 end
+                
+
+                desc_next = 1;
+
+                
+                // $display("INPUT TIMESTAMP: %d",timestamp );
             end
 
         end  
     end
     else if(parser_state ==PK_DATA_STATE) begin
         if(if_drop) begin
-            after_parse_axis_tready = 1;
+            s_rx_axis_tready = 1;
         end
         else begin
-            s_output_fifo_tvalid = after_parse_axis_tvalid;
-            s_output_fifo_tdata = after_parse_axis_tdata;
-            s_output_fifo_tlast = after_parse_axis_tlast;
+            s_output_fifo_tvalid = s_rx_axis_tvalid;
+            s_output_fifo_tdata = s_rx_axis_tdata;
+            s_output_fifo_tlast = s_rx_axis_tlast;
             if(if_bypass) begin
                 s_output_fifo_tdest = next_dest_port;
                 s_output_fifo_tuser = 1;
@@ -306,27 +348,23 @@ always @* begin
                 s_output_fifo_tuser = 0;
             end
 
-            s_output_fifo_tkeep = after_parse_axis_tkeep;
-            after_parse_axis_tready = s_output_fifo_tready;
+            s_output_fifo_tkeep = s_rx_axis_tkeep;
+            s_rx_axis_tready = s_output_fifo_tready;
         end
 
     end
 end
 
-// ila_panic_parser ila_panic_parser_inst (
-// 	.clk(clk), // input wire clk
-
-
-// 	.probe0(s_parser_desc_fifo_tready), // input wire [0:0] probe0  
-// 	.probe1( {s_parser_desc_fifo_tdata[`PANIC_DESC_WIDTH-1:0],alloc_mem_intense,alloc_mem_success,desc_pk_len,desc_prio,desc_chain,desc_time}), // input wire [511:0]  probe1 
-// 	.probe2( 0), // input wire [63:0]  probe2 
-// 	.probe3( s_parser_desc_fifo_tvalid), // input wire [0:0]  probe3 
-// 	.probe4( 1), // input wire [0:0]  probe4 
-// 	.probe5( 0), // input wire [0:0]  probe5 
-// 	.probe6( {{64{1'b1}}}), // input wire [63:0]  probe6 
-// 	.probe7( {{3{1'b1}}}), // input wire [2:0]  probe7  
-// 	.probe8( 0) // input wire [0:0]  probe8
-// );
+always @(posedge clk) begin
+    if(rst) begin
+        id_counter <= 0;
+    end
+    else begin
+        if(s_parser_desc_fifo_tvalid) begin
+            id_counter <= id_counter + 1; 
+        end
+    end
+end
 
 
 endmodule
