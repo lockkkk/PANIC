@@ -133,7 +133,7 @@ panic_inst
 );
 
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(1024 * AXIS_KEEP_WIDTH),
     .DATA_WIDTH(AXIS_DATA_WIDTH),
     .KEEP_ENABLE(1),

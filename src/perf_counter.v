@@ -215,10 +215,10 @@ always@(posedge clk) begin
             end
 
             if(iter_counter > 1) begin
-                $display("--------------");
-                $display("- Traffic Group 1: %f Gbps " ,inter_in_frame_counter[0] * 512 * 1.0 / ((2**10) * 4.0) );
-                $display("- Traffic Group 2: %f Gbps " ,inter_in_frame_counter[1] * 512 * 1.0 / ((2**10) * 4.0) );
-                $display("- Traffic Group 3: %f Gbps " ,inter_in_frame_counter[2] * 512 * 1.0 / ((2**10) * 4.0) );
+                //$display("--------------");
+                //$display("- Traffic Group 1: %f Gbps " ,inter_in_frame_counter[0] * 512 * 1.0 / ((2**10) * 4.0) );
+                //$display("- Traffic Group 2: %f Gbps " ,inter_in_frame_counter[1] * 512 * 1.0 / ((2**10) * 4.0) );
+                //$display("- Traffic Group 3: %f Gbps " ,inter_in_frame_counter[2] * 512 * 1.0 / ((2**10) * 4.0) );
             end
 
             

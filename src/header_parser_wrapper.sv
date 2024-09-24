@@ -66,7 +66,7 @@ wire                           s_output_fifo_tready;
 reg                            s_output_fifo_tlast;
 
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(64 * AXIS_KEEP_WIDTH),
     .DATA_WIDTH(AXIS_DATA_WIDTH),
     .KEEP_ENABLE(1),

@@ -52,7 +52,7 @@ generate
         wire                    fifo_update_req_data_valid;
         reg                     fifo_update_req_data_ready;
 
-        axis_fifo #(
+        axis_fifo_old #(
             .DEPTH(4),
             .DATA_WIDTH(KEY_SIZE),
             .KEEP_ENABLE(0),
@@ -77,7 +77,7 @@ generate
         );
 
 
-        axis_fifo #(
+        axis_fifo_old #(
             .DEPTH(4),
             .DATA_WIDTH(VALUE_SIZE),
             .KEEP_ENABLE(0),
@@ -165,7 +165,7 @@ wire  [LOOKUP_PORTS*KEY_SIZE-1:0]   fifo_lookup_req_index;
 wire  [LOOKUP_PORTS-1:0]            fifo_lookup_req_valid;
 wire  [LOOKUP_PORTS-1:0]            fifo_lookup_req_ready;
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(4),
     .DATA_WIDTH(LOOKUP_PORTS*KEY_SIZE),
     .KEEP_ENABLE(0),

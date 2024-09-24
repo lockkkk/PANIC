@@ -73,7 +73,7 @@ always @(posedge clk) begin
         latency_bucket[s_flow_class_reg] <= cur_pk_latency + latency_bucket[s_flow_class_reg];
         counter_bucket[s_flow_class_reg] <= counter_bucket[s_flow_class_reg] + 1;
         if(counter_bucket[0] >= 128) begin
-            $display("Latency %f", latency_bucket[0] * 4.0 / (1.0 * counter_bucket[0]));
+          //  $display("Latency %f", latency_bucket[0] * 4.0 / (1.0 * counter_bucket[0]));
             counter_bucket[0] <= 0;
             latency_bucket[0] <= 0;
         end

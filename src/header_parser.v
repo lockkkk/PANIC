@@ -186,6 +186,7 @@ always @*begin
     m_desc_chain = 0;
     m_desc_pk_len = ip_len_next + 14; // add eth packet header
     tmp_desc = 0;
+    m_desc_flow_id = 0;
 
     if(s_axis_tvalid) begin
         if(udp_next) begin
@@ -216,7 +217,7 @@ always @(posedge clk) begin
     if(udp_next && port_src_next== 0)
         rr_reg <= rr_reg + 1;
     
-    variance_range = 0.4 * temp_des_time[0];
+    variance_range = 1 * temp_des_time[0];
     if(variance_range == 0)
         R = 0;
     else begin

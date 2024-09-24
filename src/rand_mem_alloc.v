@@ -43,7 +43,7 @@ wire [CELL_ID_WIDTH -1 : 0]     free_port0_fifo_cell_id;
 
 assign free_port0_fifo_tready = free_port0_fifo_tready_reg;
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(4),
     .DATA_WIDTH(LEN_WIDTH + CELL_ID_WIDTH),
     .KEEP_ENABLE(0),
@@ -78,7 +78,7 @@ wire [CELL_ID_WIDTH -1 : 0]      free_port1_fifo_cell_id;
 // wire [AXI_ADDR_WIDTH -1 : 0]     free_port1_fifo_addr;
 
 assign free_port1_fifo_tready = free_port1_fifo_tready_reg;
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(4),
     .DATA_WIDTH(LEN_WIDTH + CELL_ID_WIDTH),
     .KEEP_ENABLE(0),
@@ -134,7 +134,7 @@ wire [CELL_ID_WIDTH-1:0]           m_cell_fifo_tdata;
 wire                                m_cell_fifo_tvalid;
 wire                                 m_cell_fifo_tready;
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(CELL_NUM + 10),
     .DATA_WIDTH(CELL_ID_WIDTH),
     .KEEP_ENABLE(0),

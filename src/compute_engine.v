@@ -100,7 +100,7 @@ wire [SWITCH_DEST_WIDTH-1:0]      m_input_fifo_tdest;
 wire [SWITCH_USER_WIDTH-1:0]      m_input_fifo_tuser;
 
 assign m_input_fifo_tready = m_input_fifo_tready_reg;
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(4 * SWITCH_KEEP_WIDTH),
     .DATA_WIDTH(SWITCH_DATA_WIDTH),
     .KEEP_ENABLE(1),
@@ -270,7 +270,7 @@ assign  m_data_buffer_fifo_tready = m_data_buffer_fifo_tready_reg;
 
 
 // max two packet
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(INIT_CREDIT_NUM * 24 * SWITCH_KEEP_WIDTH),
     .DATA_WIDTH(SWITCH_DATA_WIDTH),
     .KEEP_ENABLE(1),
@@ -307,7 +307,7 @@ wire                                 s_cancle_credit_fifo_tready;
 
 
 // max two packet
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(4),
     .DATA_WIDTH(SWITCH_DATA_WIDTH),
     .KEEP_ENABLE(0),
@@ -530,7 +530,7 @@ wire [SWITCH_DEST_WIDTH-1:0]      s_output_fifo_tdest;
 wire [SWITCH_USER_WIDTH-1:0]      s_output_fifo_tuser;
 
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(24 * SWITCH_KEEP_WIDTH),
     .DATA_WIDTH(SWITCH_DATA_WIDTH),
     .KEEP_ENABLE(1),

@@ -62,7 +62,7 @@ always @(posedge clk) begin
     end
 end
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(4),
     .DATA_WIDTH(`PANIC_DESC_WIDTH),
     .KEEP_ENABLE(0),
@@ -178,10 +178,10 @@ axis_async_fifo #(
 )
 in_axis_async_fifo (
     // Common reset
-    // .async_rst(rst|rst_150),
+    .async_rst(rst|rst_150),
     // AXI input
     .s_clk(clk),
-    .s_rst(rst),
+    // .s_rst(rst),
     .s_axis_tdata(s_data_buffer_tdata),
     .s_axis_tkeep(s_data_buffer_tkeep),
     .s_axis_tvalid(s_data_buffer_tready && s_data_buffer_tvalid && !if_sha_desc),
@@ -190,7 +190,7 @@ in_axis_async_fifo (
 
     // AXI output
     .m_clk(clk_150),
-    .m_rst(rst_150),
+    // .m_rst(rst_150),
     .m_axis_tdata(m_data_buffer_150_tdata),
     .m_axis_tkeep(m_data_buffer_150_tkeep),
     .m_axis_tvalid(m_data_buffer_150_tvalid),
@@ -357,7 +357,7 @@ keccak uut (
 
 
 assign  s_sha_tiny_fifo_tvalid = s_sha_tiny_fifo_tvalid_tmp && !sha_rst;
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(4),
     .DATA_WIDTH(512),
     .KEEP_ENABLE(0),
@@ -395,17 +395,17 @@ axis_async_fifo #(
 )
 out_sha_async_fifo (
     // Common reset
-    // .async_rst(rst|rst_150),
+    .async_rst(rst|rst_150),
     // AXI input
     .s_clk(clk_150),
-    .s_rst(rst_150),
+    // .s_rst(rst_150),
     .s_axis_tdata(m_sha_tiny_fifo_tdata),
     .s_axis_tvalid(m_sha_tiny_fifo_tvalid),
     .s_axis_tready(m_sha_tiny_fifo_tready),
 
     // AXI output
     .m_clk(clk),
-    .m_rst(rst),
+    // .m_rst(rst),
     .m_axis_tdata(m_sha_tdata),
     .m_axis_tvalid(m_sha_tvalid),
     .m_axis_tready(m_sha_tready)
@@ -429,7 +429,7 @@ assign s_tmp_data_buffer_fifo_tkeep  = s_data_buffer_tkeep;
 assign s_tmp_data_buffer_fifo_tlast  = s_data_buffer_tlast;
 assign s_tmp_data_buffer_fifo_tvalid = s_data_buffer_tready && s_data_buffer_tvalid && !if_sha_desc;
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(64 * SWITCH_KEEP_WIDTH),
     .DATA_WIDTH(SWITCH_DATA_WIDTH),
     .KEEP_ENABLE(1),

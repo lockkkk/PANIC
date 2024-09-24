@@ -111,7 +111,7 @@ module panic #
 localparam FREE_PORT_NUM = 2;
 localparam CELL_NUM = 2**(AXI_ADDR_WIDTH+1)/`PANIC_CELL_SIZE;
 localparam CELL_ID_WIDTH = $clog2(CELL_NUM);
-localparam NUMPIFO = 128;
+localparam NUMPIFO = 64;
 localparam SMALL_PK_OPT = 0;
 
 wire [ENGINE_NUM*2 -1 :0] credit_control;

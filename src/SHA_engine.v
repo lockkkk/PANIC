@@ -99,7 +99,7 @@ wire [SWITCH_DEST_WIDTH-1:0]      m_input_fifo_tdest;
 wire [SWITCH_USER_WIDTH-1:0]      m_input_fifo_tuser;
 
 assign m_input_fifo_tready = m_input_fifo_tready_reg;
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(4 * SWITCH_KEEP_WIDTH),
     .DATA_WIDTH(SWITCH_DATA_WIDTH),
     .KEEP_ENABLE(1),
@@ -258,7 +258,7 @@ always @* begin
     end
 end
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(128 * SWITCH_KEEP_WIDTH),
     .DATA_WIDTH(SWITCH_DATA_WIDTH),
     .KEEP_ENABLE(1),
@@ -289,7 +289,7 @@ data_buffer_fifo (
     // .m_axis_tuser(rx_parser_data_fifo_tuser)
 );
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(4),
     .DATA_WIDTH(SWITCH_DATA_WIDTH),
     .KEEP_ENABLE(0),
@@ -543,7 +543,7 @@ switch_out_mux (
 
 
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(32 * SWITCH_KEEP_WIDTH),
     .DATA_WIDTH(SWITCH_DATA_WIDTH),
     .KEEP_ENABLE(1),

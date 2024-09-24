@@ -264,7 +264,7 @@ generate
         );
 
         // small fifo for pifo input
-        axis_fifo #(
+        axis_fifo_old #(
             .DEPTH(4),
             .DATA_WIDTH(`PANIC_DESC_WIDTH + `PANIC_DESC_PRIO_SIZE),
             .KEEP_ENABLE(0),
@@ -290,7 +290,7 @@ generate
         );
 
         // small fifo for pifo drop
-        axis_fifo #(
+        axis_fifo_old #(
             .DEPTH(4),
             .DATA_WIDTH(`PANIC_DESC_WIDTH + `PANIC_DESC_PRIO_SIZE),
             .KEEP_ENABLE(0),
@@ -321,7 +321,7 @@ endgenerate
 
 
 // small fifo for pifo output
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(2),
     .DATA_WIDTH(`PANIC_DESC_WIDTH + `PANIC_DESC_PRIO_SIZE + 4),
     .KEEP_ENABLE(0),
@@ -360,6 +360,7 @@ always @* begin
 
     s_pifo_in_fifo_data[0] = m_pifo_in_port_arb_data;  
     s_pifo_in_fifo_data[1] = m_pifo_in_port_arb_data;  
+    m_pifo_in_port_arb_ready = 0;
 
     if(TEST_MODE == 0 ) begin
         if(m_pifo_in_port_arb_valid && s_pifo_in_fifo_ready[0] && m_pifo_in_port_arb_data[`PANIC_DESC_CHAIN_OF +: `PANIC_DESC_CHAIN_ITEM_SIZE] <= 5) begin // service 1 goto pifo 0
@@ -582,7 +583,7 @@ generate
 
         assign  m_crossbar_desc_fifo_tready = m_crossbar_desc_fifo_tready_reg;
         //descriptor fifo, size need > 5, inorder to pipeline the ram read cycle
-        axis_fifo #(
+        axis_fifo_old #(
             .DEPTH(8),
             .DATA_WIDTH(`PANIC_DESC_WIDTH),
             .KEEP_ENABLE(0),
@@ -619,7 +620,7 @@ generate
         assign m_crossbar_data_fifo_tready = m_crossbar_data_fifo_tready_reg;
 
         // small sending data buffer for crossbar, we assume that corssbar has fast throughput
-        axis_fifo #(
+        axis_fifo_old #(
             .DEPTH(8 * AXIS_KEEP_WIDTH),
             .DATA_WIDTH(AXIS_DATA_WIDTH),
             .KEEP_ENABLE(1),
@@ -766,7 +767,7 @@ generate
         end
 
 
-        axis_fifo #(
+        axis_fifo_old #(
             .DEPTH(24 * AXIS_KEEP_WIDTH),
             .DATA_WIDTH(AXIS_DATA_WIDTH),
             .KEEP_ENABLE(1),

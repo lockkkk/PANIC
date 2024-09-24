@@ -467,7 +467,7 @@ generate
         assign flow_ctrl_in_op[m*flow_ctrl_width:(m+1)*flow_ctrl_width-1] = flow_ctrl_in;
         assign channel_dly_o = channel_out_op[m*channel_width:(m+1)*channel_width-1];
 
-        axis_fifo #(
+        axis_fifo_old #(
             .DEPTH(buffer_size * KEEP_WIDTH),
             .DATA_WIDTH(DATA_WIDTH),
             .KEEP_ENABLE(1),

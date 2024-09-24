@@ -101,7 +101,7 @@ wire [SWITCH_DEST_WIDTH-1:0]      m_input_fifo_tdest;
 wire [SWITCH_USER_WIDTH-1:0]      m_input_fifo_tuser;
 
 assign m_input_fifo_tready = m_input_fifo_tready_reg;
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(4 * SWITCH_KEEP_WIDTH),
     .DATA_WIDTH(SWITCH_DATA_WIDTH),
     .KEEP_ENABLE(1),
@@ -261,7 +261,7 @@ end
 
 
 // max two packet
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(64 * SWITCH_KEEP_WIDTH),
     .DATA_WIDTH(SWITCH_DATA_WIDTH),
     .KEEP_ENABLE(1),
@@ -292,7 +292,7 @@ data_buffer_fifo (
     // .m_axis_tuser(rx_parser_data_fifo_tuser)
 );
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(4),
     .DATA_WIDTH(SWITCH_DATA_WIDTH),
     .KEEP_ENABLE(0),
@@ -375,7 +375,7 @@ always @(posedge clk) begin
     end
 end
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(64),
     .DATA_WIDTH(`PANIC_DESC_WIDTH),
     .KEEP_ENABLE(0),
@@ -431,7 +431,7 @@ wire                                 m_aes_data_out_fifo_tready;
 wire [SWITCH_KEEP_WIDTH-1:0]         m_aes_data_out_fifo_tkeep;
 wire                                 m_aes_data_out_fifo_tlast;
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(128),
     .DATA_WIDTH(SWITCH_KEEP_WIDTH+1),
     .KEEP_ENABLE(0),
@@ -545,7 +545,7 @@ reg                                   m_aes_shape_fifo_tready_reg;
 assign m_aes_shape_fifo_tready = m_aes_shape_fifo_tready_reg;
 
 reg [7:0]  shape_counter;
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(32 * SWITCH_KEEP_WIDTH),
     .DATA_WIDTH(SWITCH_DATA_WIDTH),
     .KEEP_ENABLE(1),
@@ -616,7 +616,7 @@ always @(posedge clk) begin
     end
 end
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(64),
     .DATA_WIDTH(128),
     .KEEP_ENABLE(0),
@@ -802,7 +802,7 @@ switch_out_mux (
 );
 
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(32 * SWITCH_KEEP_WIDTH),
     .DATA_WIDTH(SWITCH_DATA_WIDTH),
     .KEEP_ENABLE(1),

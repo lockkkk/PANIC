@@ -169,6 +169,7 @@ always @* begin
     free_mem_req = 0;
     free_cell_id = 0;
     free_mem_size = 0;
+    free_bank_id = 0;
 
     if(if_packet_header_reg && s_switch_axis_tvalid && s_switch_axis_tready) begin  // input packet header
         // free mem request
@@ -191,7 +192,7 @@ always @* begin
     end
 end
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(26 * AXIS_KEEP_WIDTH),
     .DATA_WIDTH(AXIS_DATA_WIDTH),
     .KEEP_ENABLE(1),

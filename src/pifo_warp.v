@@ -108,17 +108,17 @@ axis_async_fifo #(
 )
 in_axis_async_fifo (
     // Common reset
-    // .async_rst(rst|rst_125),
+    .async_rst(rst|rst_125),
     // AXI input
     .s_clk(clk),
-    .s_rst(rst),
+    // .s_rst(rst),
     .s_axis_tdata({pifo_in_data,pifo_in_prio}),
     .s_axis_tvalid(pifo_in_valid),
     .s_axis_tready(pifo_in_ready),
 
     // AXI output
     .m_clk(clk_125),
-    .m_rst(rst_125),
+    // .m_rst(rst_125),
     .m_axis_tdata({pifo_125_in_data,pifo_125_in_prio}),
     .m_axis_tvalid(pifo_125_in_valid),
     .m_axis_tready(pifo_125_in_ready)
@@ -139,17 +139,17 @@ axis_async_fifo #(
 )
 out_axis_async_fifo (
     // Common reset
-    // .async_rst(rst|rst_125),
+    .async_rst(rst|rst_125),
     // AXI input
     .s_clk(clk_125),
-    .s_rst(rst_125),
+    // .s_rst(rst_125),
     .s_axis_tdata({pifo_125_out_data,pifo_125_out_prio}),
     .s_axis_tvalid(pifo_125_out_valid),
     .s_axis_tready(pifo_125_out_ready),
 
     // AXI output
     .m_clk(clk),
-    .m_rst(rst),
+    // .m_rst(rst),
     .m_axis_tdata({pifo_out_data,pifo_out_prio}),
     .m_axis_tvalid(pifo_out_valid),
     .m_axis_tready(pifo_out_ready)
@@ -172,17 +172,17 @@ axis_async_fifo #(
 )
 out_drop_axis_async_fifo (
     // Common reset
-    // .async_rst(rst|rst_125),
+    .async_rst(rst|rst_125),
     // AXI input
     .s_clk(clk_125),
-    .s_rst(rst_125),
+    // .s_rst(rst_125),
     .s_axis_tdata({pifo_125_out_drop_data,pifo_125_out_drop_prio}),
     .s_axis_tvalid(pifo_125_out_drop_valid),
     .s_axis_tready(pifo_125_out_drop_tready),
 
     // AXI output
     .m_clk(clk),
-    .m_rst(rst),
+    // .m_rst(rst),
     .m_axis_tdata({pifo_out_drop_data,pifo_out_drop_prio}),
     .m_axis_tvalid(pifo_out_drop_valid),
     .m_axis_tready(1)

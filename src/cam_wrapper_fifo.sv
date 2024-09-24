@@ -43,7 +43,7 @@ module cam_wrapper_fifo #(
     wire                                  fifo_lookup_value_ready;
     wire  [LOOKUP_USER_WIDTH-1:0]         fifo_lookup_value_user;
 
-    axis_fifo #(
+    axis_fifo_old #(
         .DEPTH(4),
         .DATA_WIDTH(KEY_SIZE + VALUE_SIZE + UPDATE_USER_WIDTH),
         .KEEP_ENABLE(0),
@@ -67,7 +67,7 @@ module cam_wrapper_fifo #(
         .m_axis_tready(fifo_update_req_ready)
     );
 
-    axis_fifo #(
+    axis_fifo_old #(
         .DEPTH(4),
         .DATA_WIDTH(KEY_SIZE + LOOKUP_USER_WIDTH),
         .KEEP_ENABLE(0),
@@ -91,7 +91,7 @@ module cam_wrapper_fifo #(
         .m_axis_tready(fifo_lookup_req_ready)
     );
 
-    axis_fifo #(
+    axis_fifo_old #(
         .DEPTH(4),
         .DATA_WIDTH(VALUE_SIZE + LOOKUP_USER_WIDTH),
         .KEEP_ENABLE(0),

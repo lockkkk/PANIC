@@ -113,7 +113,7 @@ reg [SWITCH_DEST_WIDTH-1:0]      s_output_fifo_tdest;
 reg [SWITCH_USER_WIDTH-1:0]      s_output_fifo_tuser;
 
 
-axis_fifo #(
+axis_fifo_old #(
     .DEPTH(1024 * SWITCH_KEEP_WIDTH),
     .DATA_WIDTH(SWITCH_DATA_WIDTH),
     .KEEP_ENABLE(1),
