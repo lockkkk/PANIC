@@ -66,6 +66,7 @@ module panic_dma #
     input   wire                                m_rx_axis_tready,
     output  wire                                m_rx_axis_tlast,
     output  wire                                m_rx_axis_tuser,
+    output  wire [16-1:0]                       m_rx_axis_tdest,
 
     /*
     * Crossbar interface input
@@ -193,10 +194,10 @@ always @* begin
 end
 
 axis_fifo_old #(
-    .DEPTH(26 * AXIS_KEEP_WIDTH),
-    .DATA_WIDTH(AXIS_DATA_WIDTH),
+    .DEPTH(64 * (AXIS_KEEP_WIDTH + 2)),
+    .DATA_WIDTH((AXIS_DATA_WIDTH + 16)),
     .KEEP_ENABLE(1),
-    .KEEP_WIDTH(AXIS_KEEP_WIDTH),
+    .KEEP_WIDTH((AXIS_KEEP_WIDTH + 2)),
     .LAST_ENABLE(AXIS_LAST_ENABLE),
     .USER_ENABLE(0),
     // .USER_WIDTH(AXIS_USER_WIDTH),
@@ -209,14 +210,14 @@ receive_data_fifo (
     .rst(rst),
 
     // AXI input
-    .s_axis_tdata(s_receive_data_fifo_tdata),
+    .s_axis_tdata({s_receive_data_fifo_tdata, 16'h0 + flow_class}),
     .s_axis_tkeep(s_receive_data_fifo_tkeep),
     .s_axis_tvalid(s_receive_data_fifo_tvalid),
     .s_axis_tready(s_receive_data_fifo_tready),
     .s_axis_tlast(s_receive_data_fifo_tlast),
 
     // AXI output
-    .m_axis_tdata(m_rx_axis_tdata),
+    .m_axis_tdata({m_rx_axis_tdata, m_rx_axis_tdest}),
     .m_axis_tkeep(m_rx_axis_tkeep),
     .m_axis_tvalid(m_rx_axis_tvalid),
     .m_axis_tready(m_rx_axis_tready),

@@ -20,8 +20,11 @@ reg                             desc_drop;
 reg [`PANIC_DESC_FLOW_SIZE-1:0] desc_flow_id;
 reg [`PANIC_DESC_TS_SIZE-1:0]   desc_ts;
 
-
-
+localparam REG_DATA_WIDTH = 32;
+localparam REG_ADDR_WIDTH = 16;
+reg [REG_ADDR_WIDTH-1:0]            ctrl_reg_wr_addr;
+reg [REG_DATA_WIDTH-1:0]            ctrl_reg_wr_data;
+reg                                 ctrl_reg_wr_en;
  
 always begin
     clk = ~clk; 
@@ -52,35 +55,23 @@ initial begin
     config_mat_en = 0;
     packet_len = 4;
     pattern_id = 0;
+    ctrl_reg_wr_en = 0;
     #1000;
     rst = 0;
     #800;
-    config_mat_en = 1;
-    config_mat_key = 33;
-    desc_cell_id = 0;
-    desc_len = 0;
-    desc_drop = 0;
-    desc_chain = 0;
-    desc_prio = 4;
-    desc_flow_id = 1;
-    desc_time = 0;
-    config_mat_value = 0 + {desc_flow_id,desc_drop,desc_time,desc_prio,desc_chain,desc_cell_id,desc_len};
+    // config monitor 
+    ctrl_reg_wr_en = 1;
+    ctrl_reg_wr_data = {16'h4, 8'h40, 4'h1, 4'h0};
+    ctrl_reg_wr_addr = 16'h0094;
     #4;
-    config_mat_en = 0;
+    ctrl_reg_wr_en = 0;
     #4;
-    config_mat_en = 1;
-    config_mat_key = 44;
-    desc_cell_id = 0;
-    desc_len = 0;
-    desc_drop = 0;
-    desc_chain = 4;
-    desc_prio = 4;
-    desc_flow_id = 2;
-    desc_time = 4;
-    config_mat_value = 0 + {desc_flow_id,desc_drop,desc_time,desc_prio,desc_chain,desc_cell_id,desc_len};
+    // config monitor 
+    ctrl_reg_wr_en = 1;
+    ctrl_reg_wr_data = {16'h4, 8'h40, 4'h1, 4'h1};
+    ctrl_reg_wr_addr = 16'h0094;
     #4;
-    config_mat_en = 0;
-    #2;
+    ctrl_reg_wr_en = 0;
     #600;
     start = 1;
 
@@ -114,7 +105,7 @@ reg  [PORTS-1:0]                    fifo_rx_axis_tuser;
 wire [PORTS*AXIS_DATA_WIDTH-1:0]    panic_rx_axis_tdata;
 wire [PORTS*AXIS_KEEP_WIDTH-1:0]    panic_rx_axis_tkeep;
 wire [PORTS-1:0]                    panic_rx_axis_tvalid;
-reg  [PORTS-1:0]                    panic_rx_axis_tready=1;
+reg  [PORTS-1:0]                    panic_rx_axis_tready;
 wire [PORTS-1:0]                    panic_rx_axis_tlast;
 wire [PORTS-1:0]                    panic_rx_axis_tuser;
 
@@ -139,7 +130,8 @@ panic #
     .TAG_WIDTH(8),
     .ENABLE_UNALIGNED(1),
     .ENABLE_SG(0),
-
+    .REG_DATA_WIDTH(REG_DATA_WIDTH),
+    .REG_ADDR_WIDTH(REG_ADDR_WIDTH),
     /*CROSSBAR PARAMETER*/
     // crossbar data width
     .SWITCH_DATA_WIDTH(512),
@@ -159,10 +151,14 @@ panic_inst
     .clk(clk),
     .rst(rst),
 
-    .config_mat_en(config_mat_en),
-    .config_mat_key(config_mat_key),
-    .config_mat_value(config_mat_value),
-    .config_mat_addr(config_mat_addr),
+    .ctrl_reg_wr_addr(ctrl_reg_wr_addr),
+    .ctrl_reg_wr_data(ctrl_reg_wr_data),
+    .ctrl_reg_wr_en(ctrl_reg_wr_en),
+    .ctrl_reg_wr_ack(),
+    .ctrl_reg_rd_addr(0),
+    .ctrl_reg_rd_en(0),
+    .ctrl_reg_rd_data(),
+    .ctrl_reg_rd_ack(),
     /*
     * Receive data from the wire
     */
@@ -265,7 +261,7 @@ always@(posedge clk) begin
         counter <= 1;
         c_counter <= 0;
         cycle_counter <= 0;
-        flow_id <= 44;
+        flow_id <= 0;
         if_next_valid <= 0;
         total_counter <= 0;
     end
@@ -284,15 +280,15 @@ always@(posedge clk) begin
         end
         if(start && fifo_rx_axis_tlast && fifo_rx_axis_tvalid && fifo_rx_axis_tready) begin
             if(counter%10 < 4) begin
-                flow_id <= 33;
+                flow_id <= 0;
             end
             else begin
-                flow_id <= 44;
+                flow_id <= 1;
             end
             // flow_id <= 1234;
         end
         
-        if( (counter <= 500)) begin
+        if( (counter <= 5000)) begin
             if_next_valid <= 1;
         end
         else begin
@@ -311,7 +307,9 @@ always@(posedge clk) begin
         check_seq_counter <= 1;
         pk_start <= 1;
         byte_counter <= 0;
+        panic_rx_axis_tready = 1;
     end
+    // panic_rx_axis_tready = (($urandom % 128) > 100);
     if(panic_rx_axis_tvalid && panic_rx_axis_tready) begin
         check_counter <= check_counter +1;
         byte_counter <= byte_counter + 512/8;
@@ -319,7 +317,7 @@ always@(posedge clk) begin
             pk_start <= 2;
         end
         else if (pk_start == 2) begin
-            check_seq_counter = panic_rx_axis_tdata - check_counter;
+            // check_seq_counter = panic_rx_axis_tdata - check_counter;
             pk_start <= 0;
         end
         else if(!panic_rx_axis_tlast) begin

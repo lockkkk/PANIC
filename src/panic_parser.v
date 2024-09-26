@@ -98,8 +98,7 @@ module panic_parser #
 
     input  wire                        config_mat_en,
     input  wire [`MATCH_KEY_WIDTH-1:0] config_mat_key,
-    input  wire [128-1:0]              config_mat_value,
-    input  wire [`MAT_ADDR_WIDTH-1:0]  config_mat_addr,
+    input  wire [31:0]                 config_mat_value,
 
     input   wire [`PANIC_DESC_TS_SIZE-1:0]    timestamp
 

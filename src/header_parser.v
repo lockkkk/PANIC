@@ -14,8 +14,7 @@ module header_parser #
 
     input  wire                        config_mat_en,
     input  wire [`MATCH_KEY_WIDTH-1:0] config_mat_key,
-    input  wire [128-1:0]              config_mat_value,
-    // input  wire [`MAT_ADDR_WIDTH-1:0]  config_mat_addr,
+    input  wire [31:0]                 config_mat_value,
 
     /*
      * AXI input
@@ -167,11 +166,12 @@ assign temp_des_time[2] = (3 * m_desc_pk_len * 6/100) - (m_desc_pk_len/64);
 
 reg rr_reg = 0;
 
-reg [95:0] mat_table [0:7];
-wire [2:0] config_mat_addr;
+reg [31:0] mat_table [0:3];
+wire [1:0] config_mat_addr;
 wire [2:0] match_addr;
 assign config_mat_addr = config_mat_key;
 
+// config mat value = {16h'chain, 8h'time,  4'hprio, 4'hkey}
 always @(posedge clk) begin
     if(config_mat_en) begin
         mat_table[config_mat_addr] <= config_mat_value;
@@ -179,11 +179,11 @@ always @(posedge clk) begin
 end
 
 assign match_addr = port_src_next;
-reg [95:0] tmp_desc; 
+reg [31:0] tmp_desc; 
 always @*begin
     m_desc_prio = 1; // any value
-    m_desc_time = 2; // any value
-    m_desc_chain = 0;
+    m_desc_time = 16; // any value
+    m_desc_chain = 4;
     m_desc_pk_len = ip_len_next + 14; // add eth packet header
     tmp_desc = 0;
     m_desc_flow_id = 0;
@@ -191,14 +191,14 @@ always @*begin
     if(s_axis_tvalid) begin
         if(udp_next) begin
             tmp_desc = mat_table[match_addr];
-            m_desc_time = tmp_desc[`PANIC_DESC_TIME_OF +: `PANIC_DESC_TIME_SIZE];
-            m_desc_chain = tmp_desc[`PANIC_DESC_CHAIN_OF +: `PANIC_DESC_CHAIN_SIZE];
-            m_desc_flow_id = tmp_desc[`PANIC_DESC_FLOW_OF +: `PANIC_DESC_FLOW_SIZE];
-            m_desc_prio = tmp_desc[`PANIC_DESC_PRIO_OF +: `PANIC_DESC_PRIO_SIZE];
+            m_desc_prio = tmp_desc[7:4];
+            m_desc_time = tmp_desc[15:8];
+            m_desc_chain = tmp_desc[31:16];
+            m_desc_flow_id = match_addr;
         end
     end
-
 end
+
 always @(posedge clk) begin
 
     eth_type_reg <= eth_type_next;
@@ -227,7 +227,19 @@ always @(posedge clk) begin
 
 end
 
+ila_0 parser_debug (
+	.clk(clk), // input wire clk
 
+	.probe0(s_axis_tlast && s_axis_tvalid), // input wire [0:0] probe0  
+	.probe1({s_axis_tvalid,s_axis_tlast,m_desc_prio, m_desc_time, m_desc_chain, udp_next, port_src_next})
+);
+
+ila_0 ctrl_debug (
+	.clk(clk), // input wire clk
+
+	.probe0(config_mat_en), // input wire [0:0] probe0  
+	.probe1({config_mat_en,config_mat_value,config_mat_key, config_mat_addr})
+);
 
 // ila_parser hearder_parser_debug (
 // 	.clk(clk), // input wire clk

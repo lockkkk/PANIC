@@ -42,6 +42,10 @@ module panic #
     parameter ENABLE_SG = 0,
     // Enable support for unaligned transfers
     parameter ENABLE_UNALIGNED = 0,
+    // Width of control register interface address in bits
+    parameter REG_ADDR_WIDTH = 16,
+    // Width of control register interface data in bits
+    parameter REG_DATA_WIDTH = 32,
 
     // crossbar data width
     parameter SWITCH_DATA_WIDTH = 512,
@@ -62,6 +66,19 @@ module panic #
 (
     input  wire                       clk,
     input  wire                       rst,
+    /*
+     * Control register interface
+     */
+    input  wire [REG_ADDR_WIDTH-1:0]            ctrl_reg_wr_addr,
+    input  wire [REG_DATA_WIDTH-1:0]            ctrl_reg_wr_data,
+    input  wire                                 ctrl_reg_wr_en,
+    output reg                                  ctrl_reg_wr_ack,
+    input  wire [REG_ADDR_WIDTH-1:0]            ctrl_reg_rd_addr,
+    input  wire                                 ctrl_reg_rd_en,
+    output reg [REG_DATA_WIDTH-1:0]             ctrl_reg_rd_data,
+    output reg                                  ctrl_reg_rd_ack,
+
+
     /*
     * Send data output to the wire
     */
@@ -101,11 +118,7 @@ module panic #
     input   wire                                m_rx_axis_tready,
     output  wire                                m_rx_axis_tlast,
     output  wire                                m_rx_axis_tuser,
-
-    input  wire                        config_mat_en,
-    input  wire [`MATCH_KEY_WIDTH-1:0] config_mat_key,
-    input  wire [128-1:0]              config_mat_value,
-    input  wire [`MAT_ADDR_WIDTH-1:0]  config_mat_addr
+    output  wire [16-1:0]                       m_rx_axis_tdest
 
 );
 localparam FREE_PORT_NUM = 2;
@@ -144,8 +157,46 @@ wire [NODE_NUM-1:0]                        m_switch_axis_tlast;
 wire [NODE_NUM*SWITCH_DEST_WIDTH-1:0]      m_switch_axis_tdest;
 wire [NODE_NUM*SWITCH_USER_WIDTH-1:0]      m_switch_axis_tuser;
 
+reg                        config_mat_en;
+reg [`MATCH_KEY_WIDTH-1:0] config_mat_key;
+reg [31:0]                 config_mat_value;
 
+// control block
+always @(posedge clk) begin
+    ctrl_reg_wr_ack <= 1'b0;
 
+    config_mat_en <= 0;
+    config_mat_key <= 0;
+    config_mat_value <= 0;
+
+    if (ctrl_reg_wr_en && !ctrl_reg_wr_ack) begin
+        // write operation
+        ctrl_reg_wr_ack <= 1'b1;
+        if(ctrl_reg_wr_addr == 16'h0094) begin
+            config_mat_key <= ctrl_reg_wr_data[3:0];
+            config_mat_en <= 1'b1;
+            config_mat_value <= ctrl_reg_wr_data;
+            
+        end
+        else begin
+            ctrl_reg_wr_ack <= 1'b0;
+        end
+    end
+
+    if (ctrl_reg_rd_en && !ctrl_reg_rd_ack) begin
+        // read operation
+        ctrl_reg_rd_ack <= 1'b1;
+        case ({ctrl_reg_rd_addr >> 2, 2'b00})
+            16'h0080: ctrl_reg_rd_data <= 0;
+            default: ctrl_reg_rd_ack <= 1'b0;
+        endcase
+    end
+
+    if (rst) begin
+        ctrl_reg_wr_ack <= 1'b0;
+        ctrl_reg_rd_ack <= 1'b0;
+    end
+end
 /*
 PANIC MEMORY ALLOCATOR MODULE
 Function: allocate memory address for each packet, can reuse memory address when the packet exits panic.
@@ -233,7 +284,6 @@ panic_parser_inst(
     .config_mat_en(config_mat_en),
     .config_mat_key(config_mat_key),
     .config_mat_value(config_mat_value),
-    .config_mat_addr(config_mat_addr),
     /*
     * Receive data from the wire
     */
@@ -325,6 +375,7 @@ panic_dma_inst(
     .m_rx_axis_tready(m_rx_axis_tready),
     .m_rx_axis_tlast(m_rx_axis_tlast),
     .m_rx_axis_tuser(m_rx_axis_tuser),
+    .m_rx_axis_tdest(m_rx_axis_tdest),
 
     /* 
     * Crossbar port1 interface
