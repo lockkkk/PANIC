@@ -1,0 +1,38 @@
+{
+    "driverconfig": {
+      "pcieaddr": "0000:3b:00.0",
+      "corecount": 4
+    },
+
+    "panicconfig": {
+      "sche_policy": "strict_priority",
+      "engine_num": 4
+    },
+
+    "tenantconfig": {
+      "tenant1": {
+        "id": 0,
+        "prio": 1,
+        "offloadchain": ["1", "4"],
+        "ip": "192.168.0.10",
+        "port": 1234,
+        "coremask": "0x1"
+      },
+      "tenant2": {
+        "id": 1,
+        "prio": 2,
+        "offloadchain": ["2", "4"],
+        "ip": "192.168.0.11",
+        "port": 1235,
+        "coremask": "0x2"
+      },
+      "tenant3": {
+        "id": 2,
+        "prio": 3,
+        "offloadchain": [],
+        "ip": "192.168.0.12",
+        "port": 1236,
+        "coremask": "0x4"
+      }
+    }
+}
