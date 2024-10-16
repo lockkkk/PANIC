@@ -35,7 +35,7 @@
 `define PANIC_CELL_SIZE (512*3*8/8)
 `define PANIC_SERVICE_TIME (5)
 
-`define MAT_SIZE (8)
-`define MATCH_KEY_WIDTH (16)
-`define MAT_ADDR_WIDTH ($clog2(`MAT_SIZE))
-`define MAT_VALUE_SIZE (`PANIC_DESC_WIDTH)
+// `define MAT_SIZE (8)
+`define MATCH_KEY_WIDTH (2)
+// `define MAT_ADDR_WIDTH ($clog2(`MAT_SIZE))
+// `define MAT_VALUE_SIZE (`PANIC_DESC_WIDTH)

@@ -161,6 +161,10 @@ reg                        config_mat_en;
 reg [`MATCH_KEY_WIDTH-1:0] config_mat_key;
 reg [31:0]                 config_mat_value;
 
+reg                        config_cam_en;
+reg [`MATCH_KEY_WIDTH-1:0] config_cam_key;
+reg [15:0]                  config_cam_port;
+
 // control block
 always @(posedge clk) begin
     ctrl_reg_wr_ack <= 1'b0;
@@ -169,6 +173,10 @@ always @(posedge clk) begin
     config_mat_key <= 0;
     config_mat_value <= 0;
 
+    config_cam_en <= 0;
+    config_cam_key <= 0;
+    config_cam_port <= 0;
+
     if (ctrl_reg_wr_en && !ctrl_reg_wr_ack) begin
         // write operation
         ctrl_reg_wr_ack <= 1'b1;
@@ -176,7 +184,11 @@ always @(posedge clk) begin
             config_mat_key <= ctrl_reg_wr_data[3:0];
             config_mat_en <= 1'b1;
             config_mat_value <= ctrl_reg_wr_data;
-            
+        end
+        else if(ctrl_reg_wr_addr == 16'h0098) begin
+            config_cam_key <= ctrl_reg_wr_data[3:0];
+            config_cam_en <= 1'b1;
+            config_cam_port <= ctrl_reg_wr_data[19:4];
         end
         else begin
             ctrl_reg_wr_ack <= 1'b0;
@@ -284,6 +296,10 @@ panic_parser_inst(
     .config_mat_en(config_mat_en),
     .config_mat_key(config_mat_key),
     .config_mat_value(config_mat_value),
+
+    .config_cam_en(config_cam_en),
+    .config_cam_key(config_cam_key),
+    .config_cam_port(config_cam_port),
     /*
     * Receive data from the wire
     */

@@ -100,6 +100,10 @@ module panic_parser #
     input  wire [`MATCH_KEY_WIDTH-1:0] config_mat_key,
     input  wire [31:0]                 config_mat_value,
 
+    input  wire                        config_cam_en,
+    input  wire [`MATCH_KEY_WIDTH-1:0] config_cam_key,
+    input  wire [15:0]                 config_cam_port,
+
     input   wire [`PANIC_DESC_TS_SIZE-1:0]    timestamp
 
 );
@@ -175,6 +179,10 @@ panic_header_parser(
     .config_mat_key(config_mat_key),
     .config_mat_value(config_mat_value),
 
+    .config_cam_en(config_cam_en),
+    .config_cam_key(config_cam_key),
+    .config_cam_port(config_cam_port),
+    
     .m_desc_prio(desc_prio),
     .m_desc_chain(desc_chain),
     .m_desc_time(desc_time),

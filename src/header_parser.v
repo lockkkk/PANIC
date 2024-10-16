@@ -16,6 +16,10 @@ module header_parser #
     input  wire [`MATCH_KEY_WIDTH-1:0] config_mat_key,
     input  wire [31:0]                 config_mat_value,
 
+    input  wire                        config_cam_en,
+    input  wire [`MATCH_KEY_WIDTH-1:0] config_cam_key,
+    input  wire [15:0]                 config_cam_port,
+
     /*
      * AXI input
      */
@@ -168,9 +172,20 @@ reg rr_reg = 0;
 
 reg [31:0] mat_table [0:3];
 wire [1:0] config_mat_addr;
-wire [2:0] match_addr;
+wire [1:0] match_addr;
+wire match_found;
 assign config_mat_addr = config_mat_key;
 
+CAM caminst (
+    .clk(clk),
+    .rst(rst),
+    .search_data(port_src_next),
+    .match_addr(match_addr),
+    .match_found(match_found),
+    .write_en(config_cam_en),
+    .write_addr(config_cam_key),
+    .write_data(config_cam_port)
+);
 // config mat value = {16h'chain, 8h'time,  4'hprio, 4'hkey}
 always @(posedge clk) begin
     if(config_mat_en) begin
@@ -178,7 +193,6 @@ always @(posedge clk) begin
     end
 end
 
-assign match_addr = port_src_next;
 reg [31:0] tmp_desc; 
 always @*begin
     m_desc_prio = 1; // any value
@@ -189,7 +203,7 @@ always @*begin
     m_desc_flow_id = 0;
 
     if(s_axis_tvalid) begin
-        if(udp_next) begin
+        if(udp_next && match_found) begin
             tmp_desc = mat_table[match_addr];
             m_desc_prio = tmp_desc[7:4];
             m_desc_time = tmp_desc[15:8];
@@ -254,5 +268,54 @@ ila_0 ctrl_debug (
 // 	.probe7( tcp_next), // input wire [0:0]  probe7  
 // 	.probe8( udp_next) // input wire [0:0]  probe8
 // );
+
+endmodule
+
+
+module CAM #(
+    parameter DATA_WIDTH = 16,  // Width of each data entry
+    parameter ADDR_WIDTH = 2   // Number of memory locations (2^ADDR_WIDTH entries)
+) (
+    input wire                  clk,        // Clock signal
+    input wire                  rst,      // Reset signal
+    input wire [DATA_WIDTH-1:0] search_data,// Data to search
+
+    input wire                  write_en,   // Write enable signal
+    input wire [ADDR_WIDTH-1:0] write_addr, // Address to write data
+    input wire [DATA_WIDTH-1:0] write_data, // Data to write
+
+    output reg [ADDR_WIDTH-1:0] match_addr, // Address of matching data
+    output reg                  match_found // Indicates if a match was found
+);
+
+    // CAM memory array (16 entries for 4-bit address width)
+    reg [DATA_WIDTH-1:0] memory_array [2**ADDR_WIDTH-1:0];
+
+    integer i;
+
+    // Search logic: Sequentially check if any entry matches the input data
+    always @(*) begin
+        match_found = 0; // Initialize as no match
+        match_addr  = 0; // Default match address
+
+        // Search the entire CAM for a match
+        for (i = 0; i < 2**ADDR_WIDTH; i = i + 1) begin
+            if (memory_array[i] == search_data) begin
+                match_found = 1;
+                match_addr  = i;
+            end
+        end
+    end
+
+    // Write operation: Update the memory array with new data
+    always @(posedge clk) begin
+        if (rst) begin
+            for (i = 0; i < 2**ADDR_WIDTH; i = i + 1) begin
+                memory_array[i] <= 16'hffff;
+            end
+        end else if (write_en) begin
+            memory_array[write_addr] <= write_data;
+        end
+    end
 
 endmodule

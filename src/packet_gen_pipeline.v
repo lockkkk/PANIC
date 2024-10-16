@@ -6,10 +6,6 @@ reg  clk;
 reg rst;
 reg start;
 
-reg                        config_mat_en;
-reg [`MATCH_KEY_WIDTH-1:0] config_mat_key;
-reg [128-1:0]              config_mat_value;
-reg [`MAT_ADDR_WIDTH-1:0]  config_mat_addr;
 
 reg [`PANIC_DESC_LEN_SIZE-1:0] desc_len;
 reg [`PANIC_DESC_CELL_ID_SIZE-1:0] desc_cell_id;
@@ -52,7 +48,7 @@ initial begin
     clk = 0;
     rst = 1;
     start = 0;
-    config_mat_en = 0;
+
     packet_len = 4;
     pattern_id = 0;
     ctrl_reg_wr_en = 0;
@@ -66,10 +62,22 @@ initial begin
     #4;
     ctrl_reg_wr_en = 0;
     #4;
+    ctrl_reg_wr_en = 1;
+    ctrl_reg_wr_data = 0 + {16'haa, 4'h0};
+    ctrl_reg_wr_addr = 16'h0098;
+    #4;
+    ctrl_reg_wr_en = 0;
+    #4;
     // config monitor 
     ctrl_reg_wr_en = 1;
     ctrl_reg_wr_data = {16'h4, 8'h40, 4'h1, 4'h1};
     ctrl_reg_wr_addr = 16'h0094;
+    #4;
+    ctrl_reg_wr_en = 0;
+    #4;
+    ctrl_reg_wr_en = 1;
+    ctrl_reg_wr_data = 0 + {16'hbb, 4'h1};
+    ctrl_reg_wr_addr = 16'h0098;
     #4;
     ctrl_reg_wr_en = 0;
     #600;
@@ -280,10 +288,10 @@ always@(posedge clk) begin
         end
         if(start && fifo_rx_axis_tlast && fifo_rx_axis_tvalid && fifo_rx_axis_tready) begin
             if(counter%10 < 4) begin
-                flow_id <= 0;
+                flow_id <= 16'haa;
             end
             else begin
-                flow_id <= 1;
+                flow_id <= 16'hbb;
             end
             // flow_id <= 1234;
         end
